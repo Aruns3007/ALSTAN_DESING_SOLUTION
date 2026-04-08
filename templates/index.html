@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alstandesign | Engineering the Invisible</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: #0B0E14;
+            --card-bg: #161B22;
+            --accent-blue: #00D1FF;
+            --text-muted: #8B949E;
+        }
+
+        body {
+            background-image: linear-gradient(rgba(11, 14, 20, 0.8), rgba(11, 14, 20, 0.8)), 
+                              url('https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=2070');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        .hero-glow {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 50%;
+            background: radial-gradient(circle, rgba(0, 209, 255, 0.08) 0%, transparent 70%);
+            z-index: -1;
+        }
+
+        .typewriter-text {
+            display: inline-block;
+            overflow: hidden;
+            border-right: .15em solid var(--accent-blue);
+            white-space: nowrap;
+            letter-spacing: .15em;
+            animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
+        }
+
+        @keyframes typing { from { width: 0 } to { width: 100% } }
+        @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: var(--accent-blue); } }
+
+        .bento-card {
+            background: rgba(22, 27, 34, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 209, 255, 0.2); 
+            border-radius: 28px;
+            padding: 40px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .methodology-media {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%;
+            background: #05060a;
+            border-radius: 22px;
+            overflow: hidden;
+        }
+
+        .card-video {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%;
+            background: #05060a;
+            border-radius: 22px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .methodology-media video,
+        .card-video video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .bento-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 209, 255, 0.15);
+        }
+
+        .accent-card {
+            background: linear-gradient(135deg, #007bff 0%, #00d1ff 100%);
+            color: white;
+            border: none;
+        }
+
+        .text-mono {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+        }
+
+        h1 { font-weight: 900; letter-spacing: -4px; font-size: clamp(3rem, 10vw, 6rem); line-height: 1; }
+
+        .reveal-hidden { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1); }
+        .reveal-visible { opacity: 1; transform: translateY(0); }
+
+        .ticker-container {
+            background: rgba(11, 14, 20, 0.9);
+            border-top: 1px solid rgba(0, 209, 255, 0.2);
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        #status-text { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #00D1FF; transition: opacity 0.5s; }
+
+        .form-input {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(0, 209, 255, 0.35);
+            border-radius: 14px;
+            color: #ffffff;
+            padding: 15px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        .form-input:focus {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--accent-blue);
+            color: #ffffff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 209, 255, 0.18);
+        }
+        .btn-tech { background: var(--accent-blue); color: black; font-weight: 700; border-radius: 50px; padding: 12px 30px; border: none; transition: 0.3s; }
+        .project-panel {
+            background: rgba(11, 14, 20, 0.62);
+            border: 1px solid rgba(0, 209, 255, 0.18);
+            border-radius: 28px;
+            padding: 2.5rem 2rem;
+            backdrop-filter: blur(14px);
+            box-shadow: 0 0 40px rgba(0, 209, 255, 0.08);
+        }
+
+        .logo-glow { height: 50px; width: auto; filter: drop-shadow(0 0 10px rgba(0, 209, 255, 0.7)); transition: 0.3s; vertical-align: middle; }
+        @media (min-width: 768px) { .logo-glow { height: 80px; } }
+    </style>
+</head>
+<body>
+
+    <div class="ticker-container text-center">
+        <span id="status-text">INITIALIZING SYSTEM...</span>
+    </div>
+
+    <div class="hero-glow"></div>
+
+    <nav class="navbar navbar-expand-lg navbar-dark pt-4 container">
+        <a class="navbar-brand fw-bold d-flex align-items-center" href="/">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Alstandesign Logo" class="logo-glow me-3">
+            <span>ALSTANDESIGN<span style="color: var(--accent-blue);">.</span></span>
+        </a>
+
+        <div class="ms-auto d-flex align-items-center gap-4">
+            <a href="#solution" class="nav-link text-white-50 small">Solutions</a>
+            <a href="#about" class="nav-link text-white-50 small">About</a>
+            <a href="#location" class="nav-link text-white-50 small">Location</a>
+            <a href="#portfolio" class="nav-link text-white-50 small">Portfolio</a>
+            
+            {% if name %}
+                <span class="text-info text-mono" style="font-size: 0.8rem;">USER: {{ name }}</span>
+                <a href="/logout" class="btn btn-outline-danger btn-sm rounded-pill px-4">LOGOUT</a>
+            {% else %}
+                <a href="/login" class="btn btn-outline-info btn-sm rounded-pill px-4">
+                    <span class="text-mono" style="font-size: 0.7rem;">CLIENT LOGIN</span>
+                </a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main class="container mt-5">
+        <section class="py-5 mb-5">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <p class="text-mono mb-3">SYSTEM STATUS: OPTIMIZED // 2026</p>
+                    <h1 class="mb-4">ENGINEERING<br>
+                        <span class="typewriter-text" style="color: var(--accent-blue);">THE INVISIBLE</span>
+                    </h1>
+                    <p class="lead text-white-50 mb-5" style="max-width: 600px;">
+                        Architecting high-performance systems through R&D in Semiconductors, AI, and Automation control systems. Using the "Divide and Conquer" principle to solve complex engineering challenges.
+                    </p>
+                    <a href="#portfolio" class="btn btn-tech">Explore Our Labs</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-5 mb-5 reveal-hidden" id="solution">
+            <p class="text-mono mb-2">01 // Engineering Framework</p>
+            <h2 class="fw-bold display-5 mb-4">Our Methodology</h2>
+            <p class="text-white-75 lead">
+                The difference comes down to our knowledge of structure and flow. At Alstandesign, we follow a rigorous five-step model: 
+                Inquiry, Hypothesis, Body Architecture, Supporting Arguments, and Scalable Conclusion.
+            </p>
+        </section>
+
+        <section class="row g-4 mb-5 reveal-hidden" id="portfolio">
+            <div class="col-md-8">
+                <div class="bento-card position-relative overflow-hidden">
+                    {% set semiconductors_video = card_videos.get('semiconductors') %}
+                    {% if semiconductors_video %}
+                    <div class="methodology-media mb-3 rounded-4">
+                        <video class="w-100 h-100" autoplay muted loop playsinline>
+                            <source src="{{ semiconductors_video.url }}" type="video/mp4">
+                            Your browser does not support embedded videos.
+                        </video>
+                    </div>
+                    {% endif %}
+                    <div>
+                        <div class="mb-4">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-info"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M20 12h2"/><path d="M2" 12h2"/></svg>
+                        </div>
+                        <h2 class="display-6 fw-bold text-white">Semiconductors & VLSI</h2>
+                        <p class="text-white-50 mt-3">100% Proficiency in IC Design. We divide complex engineering tasks into simpler modules.</p>
+                    </div>
+                    <div class="text-mono mt-3" style="font-size: 0.6rem; opacity: 0.5;">[ CLICK TO VIEW LAB SIMULATION ]</div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <a href="https://your-video-link.com" target="_blank" class="text-decoration-none">
+                    <div class="bento-card accent-card">
+                        <h2 class="fw-bold mb-0">AI & Neural Networks</h2>
+                        <p class="small mt-2 opacity-75">85% Intelligence implementation. Focused on automation control.</p>
+                        <div class="text-mono mt-3" style="font-size: 0.6rem; opacity: 0.8;">[ WATCH AI CORE ]</div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-md-4">
+                <a href="https://your-video-link.com" target="_blank" class="text-decoration-none">
+                    <div class="bento-card">
+                        {% set cloud_video = card_videos.get('cloud') %}
+                        {% if cloud_video %}
+                        <div class="card-video">
+                            <video class="w-100 h-100" autoplay muted loop playsinline>
+                                <source src="{{ cloud_video.url }}" type="video/mp4">
+                                Your browser does not support embedded videos.
+                            </video>
+                        </div>
+                        {% endif %}
+                        <h3 class="fw-bold text-white">Cloud & DevOps</h3>
+                        <p class="text-white-50 small">Automated production methods streamlining the lifecycle.</p>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-md-8">
+                <a href="https://your-video-link.com" target="_blank" class="text-decoration-none">
+                    <div class="bento-card">
+                        {% set process_video = card_videos.get('process') %}
+                        {% if process_video %}
+                        <div class="card-video">
+                            <video class="w-100 h-100" autoplay muted loop playsinline>
+                                <source src="{{ process_video.url }}" type="video/mp4">
+                                Your browser does not support embedded videos.
+                            </video>
+                        </div>
+                        {% endif %}
+                        <h3 class="fw-bold text-white">Process Automation</h3>
+                        <p class="text-white-50">Customized solutions across Automotive and Control Systems.</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section class="py-5 mb-5 reveal-hidden" id="about">
+            <div class="row">
+                <div class="col-lg-10">
+                    <p class="text-mono mb-2">02 // About Us</p>
+                    <h2 class="fw-bold display-5 mb-4">Pragmatic • Professional • Progressive</h2>
+                    <p class="text-white-75" style="font-size: 1.1rem; line-height: 1.8;">
+                        Alstandesign enables technology through R&D, innovation, and disruption. 
+                        We adopt 3P's as our principle to deliver value through a combination of Pragmatic processes, 
+                        Professional people, and structured technologies.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-5 border-top border-white-10 reveal-hidden">
+            <div class="row justify-content-center text-center py-5">
+                <div class="col-md-6">
+                    <div class="project-panel">
+                        <h2 class="fw-bold h1 mb-4">Start a Project</h2>
+                        <form action="/submit" method="POST">
+                            <input type="email" name="email" class="form-control form-input mb-3" placeholder="Email Address" required>
+                            <textarea name="message" class="form-control form-input mb-4" placeholder="Requirement..." rows="4" required></textarea>
+                            <button type="submit" class="btn btn-tech w-100 py-3">Deploy Inquiry</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="container py-5 reveal-hidden" id="location">
+            <div class="row g-4 align-items-center">
+                <div class="col-lg-5">
+                    <p class="text-mono mb-2">04 // GLOBAL HEADQUARTERS</p>
+                    <h2 class="fw-bold mb-4">Visit Our Labs</h2>
+                    <div class="bento-card p-4">
+                        <p class="text-white-75 mb-4">
+                            <strong>Alstandesign Systems Pvt Ltd</strong><br>
+                            No. 51, 10th Cross, Sanjeevappa Layout,<br>
+                            CV Raman Nagar, Bengaluru,<br>
+                            Karnataka 560093, India
+                        </p>
+                        <a href="https://www.google.com/maps" target="_blank" class="btn btn-tech w-100 py-3">GET DIRECTIONS</a>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="bento-card p-0 overflow-hidden" style="min-height: 350px;">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3887.828574167123!2d77.66601427507655!3d12.98282368733364!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae111327777777%3A0x7777777777777777!2sCV%20Raman%20Nagar%2C%20Bengaluru!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin" 
+                            width="100%" height="350" style="border:0; filter: grayscale(1) invert(0.9);" allowfullscreen="" loading="lazy"></iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="container py-5 text-center border-top border-white-10">
+        <p class="text-white-50 small">© 2026 Alstandesign Systems Pvt Ltd.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('reveal-visible'); });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal-hidden, .bento-card').forEach(el => observer.observe(el));
+
+        const statuses = ["VLSI NODE: OPTIMIZED", "AI MODEL: TRAINING", "SERVER: ACTIVE"];
+        let currentIdx = 0;
+        setInterval(() => {
+            const tickerEl = document.getElementById('status-text');
+            if (tickerEl) {
+                currentIdx = (currentIdx + 1) % statuses.length;
+                tickerEl.style.opacity = 0;
+                setTimeout(() => { tickerEl.innerText = statuses[currentIdx]; tickerEl.style.opacity = 1; }, 500);
+            }
+        }, 3000);
+    </script>
+</body>
+</html>

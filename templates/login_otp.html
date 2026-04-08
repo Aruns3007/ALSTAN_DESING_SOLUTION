@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Identity Verification | Alstandesign</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #0B0E14;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .auth-card {
+            background: rgba(22, 27, 34, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid #00D1FF;
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 209, 255, 0.1);
+        }
+        .otp-input {
+            background: #0d1117;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #00D1FF;
+            font-size: 2rem;
+            text-align: center;
+            letter-spacing: 8px;
+            width: 100%;
+            padding: 15px;
+            margin: 20px 0;
+            transition: 0.3s;
+        }
+        .otp-input:focus {
+            border-color: #00D1FF;
+            outline: none;
+            box-shadow: 0 0 15px rgba(0, 209, 255, 0.3);
+        }
+        .btn-verify {
+            background: #00D1FF;
+            color: #000;
+            font-weight: 700;
+            border-radius: 50px;
+            padding: 12px;
+            width: 100%;
+            border: none;
+            transition: 0.3s;
+        }
+        .btn-verify:hover {
+            background: #00b8e6;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-card">
+        <h2 class="fw-bold mb-3">IDENTITY VERIFICATION</h2>
+        <p class="text-white-50 small mb-4">A 6-digit synchronization code has been sent to your device.</p>
+        
+        <form action="/login_verify" method="POST">
+            <input type="hidden" name="username" value="{{ username }}">
+            
+            <input type="text" name="otp" class="otp-input" placeholder="000000" maxlength="6" pattern="\d*" inputmode="numeric" required autofocus>
+            
+            <button type="submit" class="btn-verify">AUTHORIZE ACCESS</button>
+        </form>
+        
+        <div class="mt-4">
+            <a href="/login" class="text-info text-decoration-none small">← Back to credentials</a>
+        </div>
+    </div>
+
+</body>
+</html>

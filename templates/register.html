@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enrollment | Alstandesign Systems</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    
+    <style>
+        :root {
+            --accent-blue: #00D1FF;
+            --glass-bg: rgba(22, 27, 34, 0.8);
+            --border-glow: rgba(0, 209, 255, 0.3);
+        }
+
+        body {
+            background: #0B0E14; /* Fallback */
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Modernized Glass Card */
+        .registration-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 32px;
+            padding: 50px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Top Accent Bar */
+        .registration-card::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+        }
+
+        .enroll-header {
+            margin-bottom: 35px;
+        }
+
+        .enroll-title {
+            font-weight: 800;
+            letter-spacing: -1px;
+            color: #fff;
+            font-size: 1.8rem;
+        }
+
+        .form-label-tech {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 8px;
+            opacity: 0.8;
+        }
+
+        /* Modern Input Styling */
+        .form-input-modern {
+            background: rgba(13, 17, 23, 0.6) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 14px !important;
+            color: #fff !important;
+            padding: 14px 18px !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .form-input-modern:focus {
+            border-color: var(--accent-blue) !important;
+            box-shadow: 0 0 15px var(--border-glow) !important;
+            background: rgba(13, 17, 23, 0.9) !important;
+        }
+
+        .btn-tech-modern {
+            background: var(--accent-blue);
+            color: #000;
+            font-weight: 700;
+            letter-spacing: 1px;
+            border-radius: 14px;
+            padding: 16px;
+            border: none;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        .btn-tech-modern:hover {
+            transform: scale(1.02);
+            background: #fff;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Loading Overlay Style */
+        #loading-overlay {
+            background: rgba(11, 14, 20, 0.98);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loading-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; flex-direction: column; align-items: center; justify-content: center;">
+        <div class="spinner-border text-info" style="width: 3rem; height: 3rem; border-width: 0.2rem;" role="status"></div>
+        <p class="text-mono mt-4" id="loading-text" style="color: var(--accent-blue); font-family: 'JetBrains Mono'; letter-spacing: 3px;">ENCRYPTING IDENTITY...</p>
+    </div>
+
+    <div class="registration-card">
+        <div class="enroll-header">
+            <h2 class="enroll-title">Identity Enrollment</h2>
+            <p class="text-mono m-0" style="font-size: 0.65rem; color: rgba(255,255,255,0.4);">SECURE_NODE: BENGALURU_HUB_v2.6</p>
+        </div>
+        
+        <form action="/register" method="POST">
+            <div class="mb-4">
+                <label class="form-label-tech">Full Legal Name</label>
+                <input type="text" name="username" class="form-control form-input-modern" placeholder="e.g. ARJUN MEHTA" required>
+            </div>
+            
+            <div class="mb-4">
+                <label class="form-label-tech">Corporate Email</label>
+                <input type="email" name="email" class="form-control form-input-modern" placeholder="name@company.com" required>
+            </div>
+            
+            <div class="mb-5">
+                <label class="form-label-tech">Security Key (Password)</label>
+                <input type="password" name="password" class="form-control form-input-modern" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="btn-tech-modern w-100">Initialize Enrollment</button>
+        </form>
+        
+        <div class="mt-5 pt-3 border-top border-white-10 text-center">
+            <p class="small" style="color: rgba(255,255,255,0.5);">
+                Existing Clearance? <a href="/login" class="text-info text-decoration-none fw-bold">Login Here</a>

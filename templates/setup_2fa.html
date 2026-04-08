@@ -1,0 +1,13 @@
+<div style="text-align: center; color: white; background: #0b0e14; height: 100vh; padding-top: 50px;">
+    <h2>LINK GOOGLE AUTHENTICATOR</h2>
+    <p>Scan this QR code with your Authenticator App</p>
+    
+    <img src="data:image/png;base64,{{ qr_code }}" style="border: 10px solid white; border-radius: 10px; margin: 20px;">
+    
+    <form action="/verify/{{ username }}" method="POST">
+        <input type="text" name="otp" placeholder="Enter 6-digit code" required 
+               style="padding: 10px; border-radius: 5px; border: 1px solid #00D1FF; background: #000; color: #00D1FF;">
+        <br><br>
+        <button type="submit" style="background: #00D1FF; padding: 10px 20px; border: none; font-weight: bold;">VERIFY & ACTIVATE</button>
+    </form>
+</div>
