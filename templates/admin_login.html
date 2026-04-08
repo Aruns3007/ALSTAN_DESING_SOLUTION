@@ -3,46 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Alstandesign Portal</title>
+    <title>Admin Access | Alstandesign Portal</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        :root { --accent: #00D1FF; --bg: #0b0e14; --card: #161b22; }
+        :root { --accent: #ffc107; --bg: #0b0e14; --card: #161b22; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; height: 100vh; margin: 0; overflow: hidden; }
-        
         .login-container { display: flex; height: 100vh; }
-        
-        /* Left Side: Company Info & Image */
-        .info-side { 
-            flex: 1; 
-            background: linear-gradient(rgba(11, 14, 20, 0.8), rgba(11, 14, 20, 0.8)), 
-                        url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=2070'); 
-            background-size: cover; 
+        .info-side {
+            flex: 1;
+            background: linear-gradient(rgba(11, 14, 20, 0.78), rgba(11, 14, 20, 0.86)),
+                        url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=2070');
+            background-size: cover;
             background-position: center;
             display: flex; flex-direction: column; justify-content: center; padding: 60px;
-            border-right: 1px solid rgba(0, 209, 255, 0.2);
+            border-right: 1px solid rgba(255, 193, 7, 0.2);
         }
-        
         .info-side h1 { color: var(--accent); font-weight: 800; font-size: 3.5rem; letter-spacing: -1px; }
         .info-side p { font-size: 1.1rem; color: rgba(255,255,255,0.7); max-width: 500px; line-height: 1.6; }
-        
-        /* Right Side: Login Form */
         .form-side { width: 450px; display: flex; align-items: center; justify-content: center; background: var(--bg); }
         .login-card { width: 100%; max-width: 350px; }
-        
-        .form-control { 
-            background: var(--card); border: 1px solid rgba(0,209,255,0.2); 
-            color: white; padding: 12px; margin-bottom: 20px; 
+        .form-control {
+            background: var(--card); border: 1px solid rgba(255,193,7,0.2);
+            color: white; padding: 12px; margin-bottom: 20px;
         }
         .form-control:focus { background: #1c2128; border-color: var(--accent); color: white; box-shadow: none; }
-        
-        .btn-login { 
-            background: var(--accent); color: black; font-weight: bold; width: 100%; 
+        .btn-login {
+            background: var(--accent); color: black; font-weight: bold; width: 100%;
             padding: 12px; border: none; border-radius: 5px; transition: 0.3s;
         }
-        .btn-login:hover { background: #00b8e6; transform: translateY(-2px); }
-        
+        .btn-login:hover { background: #e0a800; transform: translateY(-2px); }
         .company-badge { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 10px; display: block; }
-        
         @media (max-width: 900px) { .info-side { display: none; } .form-side { width: 100%; } }
     </style>
 </head>
@@ -62,36 +52,31 @@
 
     <div class="login-container">
         <div class="info-side">
-            <span class="company-badge">Authorized Personnel Only</span>
-            <h1>ALSTANDESIGN</h1>
+            <span class="company-badge">Restricted Console</span>
+            <h1>ADMIN ACCESS</h1>
             <p>
-                Welcome to the central command for Alstandesign. We specialize in high-end digital architecture and secure synchronization. 
-                Our platform ensures that your design assets and project inquiries are handled with military-grade encryption and 2FA protection.
+                This entry point is reserved for authorized administrators only.
+                Regular client accounts should use the standard login page and will be directed to the dashboard.
             </p>
-            <div style="margin-top: 30px; display: flex; gap: 20px;">
-                <small style="color: var(--accent);">● Secure</small>
-                <small style="color: var(--accent);">● Reliable</small>
-                <small style="color: var(--accent);">● Innovative</small>
-            </div>
         </div>
 
         <div class="form-side">
             <div class="login-card">
-                <h3 class="mb-4">Portal Login</h3>
-                <form action="/login" method="POST">
+                <h3 class="mb-4">Administrator Login</h3>
+                <form action="/admin_login" method="POST">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
-                        <label class="form-label small text-white-50">Corporate Email</label>
-                        <input type="email" name="email" class="form-control" placeholder="name@company.com" required>
+                        <label class="form-label small text-white-50">Admin Email</label>
+                        <input type="email" name="email" class="form-control" placeholder="admin@company.com" required>
                     </div>
                     <div class="mb-4">
-                        <label class="form-label small text-white-50">Security Password</label>
-                        <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                        <label class="form-label small text-white-50">Admin Password</label>
+                        <input type="password" name="password" class="form-control" placeholder="********" required>
                     </div>
-                    <button type="submit" class="btn-login">INITIATE ACCESS</button>
+                    <button type="submit" class="btn-login">VERIFY ADMIN ACCESS</button>
                 </form>
                 <p class="mt-4 small text-center text-white-50">
-                    New user? <a href="/register" style="color: var(--accent); text-decoration: none;">Enroll Identity</a>
+                    Client account? <a href="/login" style="color: var(--accent); text-decoration: none;">Go to client login</a>
                 </p>
             </div>
         </div>

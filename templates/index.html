@@ -162,6 +162,18 @@
     </style>
 </head>
 <body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index: 2000; width: min(92vw, 720px);">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm mb-2" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
 
     <div class="ticker-container text-center">
         <span id="status-text">INITIALIZING SYSTEM...</span>
@@ -181,8 +193,9 @@
             <a href="#location" class="nav-link text-white-50 small">Location</a>
             <a href="#portfolio" class="nav-link text-white-50 small">Portfolio</a>
             
-            {% if name %}
-                <span class="text-info text-mono" style="font-size: 0.8rem;">USER: {{ name }}</span>
+            {% if current_user %}
+                <span class="text-info text-mono" style="font-size: 0.8rem;">USER: {{ current_user['username'] }}</span>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-info btn-sm rounded-pill px-4">DASHBOARD</a>
                 <a href="/logout" class="btn btn-outline-danger btn-sm rounded-pill px-4">LOGOUT</a>
             {% else %}
                 <a href="/login" class="btn btn-outline-info btn-sm rounded-pill px-4">
@@ -241,13 +254,20 @@
             </div>
 
             <div class="col-md-4">
-                <a href="https://your-video-link.com" target="_blank" class="text-decoration-none">
-                    <div class="bento-card accent-card">
-                        <h2 class="fw-bold mb-0">AI & Neural Networks</h2>
-                        <p class="small mt-2 opacity-75">85% Intelligence implementation. Focused on automation control.</p>
-                        <div class="text-mono mt-3" style="font-size: 0.6rem; opacity: 0.8;">[ WATCH AI CORE ]</div>
+                <div class="bento-card accent-card">
+                    {% set ai_video = card_videos.get('ai') %}
+                    {% if ai_video %}
+                    <div class="card-video">
+                        <video class="w-100 h-100" autoplay muted loop playsinline>
+                            <source src="{{ ai_video.url }}" type="video/mp4">
+                            Your browser does not support embedded videos.
+                        </video>
                     </div>
-                </a>
+                    {% endif %}
+                    <h2 class="fw-bold mb-0">AI & Neural Networks</h2>
+                    <p class="small mt-2 opacity-75">85% Intelligence implementation. Focused on automation control.</p>
+                    <div class="text-mono mt-3" style="font-size: 0.6rem; opacity: 0.8;">[ WATCH AI CORE ]</div>
+                </div>
             </div>
 
             <div class="col-md-4">
@@ -307,6 +327,7 @@
                     <div class="project-panel">
                         <h2 class="fw-bold h1 mb-4">Start a Project</h2>
                         <form action="/submit" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <input type="email" name="email" class="form-control form-input mb-3" placeholder="Email Address" required>
                             <textarea name="message" class="form-control form-input mb-4" placeholder="Requirement..." rows="4" required></textarea>
                             <button type="submit" class="btn btn-tech w-100 py-3">Deploy Inquiry</button>

@@ -2,60 +2,449 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Alstan Hub | Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard | Alstandesign</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/static/style.css">
     <style>
-        .stat-card {
-            background: rgba(22, 27, 34, 0.6);
-            border: 1px solid rgba(0, 209, 255, 0.2);
-            border-radius: 20px;
-            padding: 25px;
-            text-align: center;
+        :root {
+            --bg: #070b12;
+            --panel: rgba(13, 18, 28, 0.84);
+            --panel-strong: rgba(18, 25, 39, 0.95);
+            --line: rgba(0, 209, 255, 0.18);
+            --accent: #00d1ff;
+            --accent-soft: rgba(0, 209, 255, 0.12);
+            --text-dim: rgba(255, 255, 255, 0.68);
         }
-        .progress { height: 8px; background: #0d1117; }
-        .progress-bar { background: var(--accent-blue); }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            color: #fff;
+            background:
+                radial-gradient(circle at top left, rgba(0, 209, 255, 0.16), transparent 28%),
+                radial-gradient(circle at top right, rgba(65, 112, 255, 0.12), transparent 24%),
+                linear-gradient(180deg, #05070c 0%, #0b111b 100%);
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        .dashboard-shell {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-shell::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+            background-size: 64px 64px;
+            mask-image: linear-gradient(180deg, rgba(0,0,0,0.48), rgba(0,0,0,0));
+            pointer-events: none;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            backdrop-filter: blur(18px);
+            background: rgba(7, 11, 18, 0.8);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .brand-mark {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: linear-gradient(145deg, rgba(0, 209, 255, 0.28), rgba(0, 209, 255, 0.05));
+            border: 1px solid var(--line);
+            display: grid;
+            place-items: center;
+            color: var(--accent);
+            font-weight: 800;
+            letter-spacing: 0.08em;
+        }
+
+        .hero-card,
+        .info-card,
+        .action-card,
+        .form-card {
+            background: var(--panel);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            box-shadow: 0 22px 80px rgba(0, 0, 0, 0.28);
+            backdrop-filter: blur(16px);
+        }
+
+        .hero-card {
+            padding: 34px;
+            min-height: 100%;
+            background:
+                linear-gradient(135deg, rgba(0, 209, 255, 0.10), transparent 42%),
+                var(--panel-strong);
+        }
+
+        .eyebrow {
+            color: var(--accent);
+            letter-spacing: 0.24em;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .hero-title {
+            font-size: clamp(2.4rem, 5vw, 4.8rem);
+            line-height: 0.94;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            margin-bottom: 1rem;
+        }
+
+        .hero-title span {
+            color: var(--accent);
+        }
+
+        .subtext {
+            color: var(--text-dim);
+            max-width: 680px;
+            font-size: 1.04rem;
+            line-height: 1.7;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .metric {
+            padding: 18px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .metric .label {
+            color: rgba(255,255,255,0.58);
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+
+        .metric .value {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-top: 6px;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #fff;
+            font-size: 0.88rem;
+        }
+
+        .pill-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 16px rgba(0, 209, 255, 0.7);
+        }
+
+        .section-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+
+        .info-card,
+        .action-card,
+        .form-card {
+            padding: 26px;
+            height: 100%;
+        }
+
+        .action-link {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            text-decoration: none;
+            color: #fff;
+            padding: 16px 18px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .action-link:hover {
+            transform: translateY(-2px);
+            border-color: rgba(0, 209, 255, 0.3);
+            background: rgba(0, 209, 255, 0.08);
+        }
+
+        .action-link small {
+            color: var(--text-dim);
+        }
+
+        .form-control {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.10);
+            color: #fff;
+            border-radius: 14px;
+        }
+
+        .form-control:focus {
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 0.2rem rgba(0, 209, 255, 0.12);
+        }
+
+        textarea.form-control {
+            min-height: 140px;
+            resize: vertical;
+        }
+
+        .btn-accent {
+            background: var(--accent);
+            color: #00131a;
+            border: none;
+            font-weight: 700;
+            border-radius: 999px;
+            padding: 12px 18px;
+        }
+
+        .btn-accent:hover {
+            background: #39dfff;
+            color: #00131a;
+        }
+
+        .status-badge {
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .status-good {
+            color: #7fffd4;
+            background: rgba(127, 255, 212, 0.08);
+            border: 1px solid rgba(127, 255, 212, 0.18);
+        }
+
+        .status-warn {
+            color: #ffc107;
+            background: rgba(255, 193, 7, 0.08);
+            border: 1px solid rgba(255, 193, 7, 0.18);
+        }
+
+        .mini-list {
+            margin: 0;
+            padding-left: 18px;
+            color: var(--text-dim);
+        }
+
+        .mini-list li {
+            margin-bottom: 8px;
+        }
     </style>
 </head>
-<body class="bg-dark text-white">
-    <nav class="navbar navbar-dark bg-transparent border-bottom border-white-10 p-3">
-        <div class="container-fluid">
-            <span class="navbar-brand fw-bold">ALSTAN<span class="text-info">HUB</span></span>
-            <a href="/logout" class="btn btn-outline-danger btn-sm rounded-pill">LOGOUT</a>
+<body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index: 2000; width: min(92vw, 560px);">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm mb-2" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-    </nav>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
 
-    <div class="container mt-5">
-        <div class="row mb-4">
-            <div class="col-12">
-                <h2 class="fw-bold">Welcome, Associate</h2>
-                <p class="text-info text-mono" style="font-size: 0.8rem;">SYSTEM NODE: ACTIVE // CLEARANCE: LEVEL 1</p>
-            </div>
-        </div>
-
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="stat-card">
-                    <p class="text-mono small mb-2">VLSI Architecture</p>
-                    <h3 class="fw-bold">85%</h3>
-                    <div class="progress mt-3"><div class="progress-bar" style="width: 85%"></div></div>
+    <div class="dashboard-shell">
+        <div class="topbar">
+            <div class="container py-3 d-flex align-items-center justify-content-between gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="brand-mark">A</div>
+                    <div>
+                        <div class="fw-bold">ALSTAN HUB</div>
+                        <div class="small text-white-50">User dashboard and account center</div>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-info btn-sm rounded-pill px-3">Home</a>
+                    <a href="/logout" class="btn btn-outline-danger btn-sm rounded-pill px-3">Logout</a>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="stat-card">
-                    <p class="text-mono small mb-2">Neural Linkage</p>
-                    <h3 class="fw-bold">42%</h3>
-                    <div class="progress mt-3"><div class="progress-bar" style="width: 42%"></div></div>
+        </div>
+
+        <div class="container py-5 position-relative" style="z-index: 1;">
+            <div class="hero-card mb-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+                    <div>
+                        <div class="eyebrow mb-2">Personal Workspace</div>
+                        <h1 class="hero-title mb-3">
+                            Welcome back,<br>
+                            <span>{{ current_user['username'] }}</span>
+                        </h1>
+                        <p class="subtext mb-0">
+                            This dashboard gives you a quick overview of your account, security status, and the fastest ways to contact the team or send a project inquiry.
+                        </p>
+                    </div>
+                    <div class="pill">
+                        <span class="pill-dot"></span>
+                        Connected and active
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-lg-8">
+                        <div class="stat-grid">
+                            <div class="metric">
+                                <div class="label">Account Type</div>
+                                <div class="value">{{ (current_user['role'] or 'user')|upper }}</div>
+                            </div>
+                            <div class="metric">
+                                <div class="label">Login Email</div>
+                                <div class="value text-truncate">{{ current_user['email'] }}</div>
+                            </div>
+                            <div class="metric">
+                                <div class="label">Security Layer</div>
+                                <div class="value">
+                                    {% if current_user['is_verified'] %}
+                                        2FA Enabled
+                                    {% else %}
+                                        2FA Pending
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="metric">
+                                <div class="label">Session Status</div>
+                                <div class="value">Protected Login</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="info-card h-100">
+                            <div class="section-title">Account Status</div>
+                            <div class="d-flex flex-column gap-3">
+                                {% if current_user['is_verified'] %}
+                                    <div class="status-badge status-good">Identity verified</div>
+                                    <p class="text-white-50 mb-0">Your account has 2FA protection enabled.</p>
+                                {% else %}
+                                    <div class="status-badge status-warn">Verification needed</div>
+                                    <p class="text-white-50 mb-0">Complete 2FA setup for stronger account security.</p>
+                                {% endif %}
+                                <div class="small text-white-50">
+                                    Last login details are not stored here, but your session is protected by the app security controls.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="stat-card">
-                    <p class="text-mono small mb-2">Cloud Nodes</p>
-                    <h3 class="fw-bold">Active</h3>
-                    <p class="text-success small mt-2">● 12ms Latency</p>
+
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="action-card">
+                        <div class="section-title">Quick Actions</div>
+                        <div class="d-grid gap-3">
+                            <a class="action-link" href="{{ url_for('index') }}">
+                                <div>
+                                    <div class="fw-semibold">Explore Home</div>
+                                    <small>Return to the main site and portfolio</small>
+                                </div>
+                                <span class="text-info">→</span>
+                            </a>
+                            <a class="action-link" href="#contact-form">
+                                <div>
+                                    <div class="fw-semibold">Send Inquiry</div>
+                                    <small>Reach the team without leaving the dashboard</small>
+                                </div>
+                                <span class="text-info">→</span>
+                            </a>
+                            <a class="action-link" href="/logout">
+                                <div>
+                                    <div class="fw-semibold">Secure Logout</div>
+                                    <small>End your session safely</small>
+                                </div>
+                                <span class="text-info">→</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="action-card">
+                        <div class="section-title">Security Checklist</div>
+                        <ul class="mini-list">
+                            <li>Passwords are hashed before storage.</li>
+                            <li>CSRF protection is active on form submissions.</li>
+                            <li>Login sessions use secure auth cookies.</li>
+                            <li>Role checks protect admin-only areas.</li>
+                            <li>2FA adds a second verification step.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="action-card">
+                        <div class="section-title">Helpful Notes</div>
+                        <ul class="mini-list">
+                            <li>Use the main site to review services and projects.</li>
+                            <li>Use this dashboard to contact the team quickly.</li>
+                            <li>If 2FA is not enabled, complete it as soon as possible.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-card" id="contact-form">
+                        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+                            <div>
+                                <div class="section-title">Project Inquiry</div>
+                                <h3 class="fw-bold mb-2">Send the team a message</h3>
+                                <p class="text-white-50 mb-0">This replaces the old empty dashboard space with something useful: a direct inquiry form already linked to your account.</p>
+                            </div>
+                            <div class="pill">
+                                <span class="pill-dot"></span>
+                                Direct to Alstandesign
+                            </div>
+                        </div>
+
+                        <form action="{{ url_for('submit_inquiry') }}" method="POST" class="row g-3">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="col-md-4">
+                                <label class="form-label small text-white-50">Your Email</label>
+                                <input type="email" name="email" class="form-control" value="{{ current_user['email'] }}" required>
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label small text-white-50">Message</label>
+                                <textarea name="message" class="form-control" placeholder="Describe what you need help with, what project you want to discuss, or what feedback you have." required></textarea>
+                            </div>
+                            <div class="col-12 d-flex justify-content-end">
+                                <button type="submit" class="btn btn-accent px-4">Submit Inquiry</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </html>
