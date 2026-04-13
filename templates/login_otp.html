@@ -77,18 +77,16 @@
 
     <div class="auth-card">
         <h2 class="fw-bold mb-3">IDENTITY VERIFICATION</h2>
-        <p class="text-white-50 small mb-4">A 6-digit synchronization code has been sent to your device.</p>
-        
+        <p class="text-white-50 small mb-4">Enter the 6-digit code from your authenticator app.</p>
+
         <form action="/login_verify" method="POST">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            
             <input type="text" name="otp" class="otp-input" placeholder="000000" maxlength="6" pattern="\d*" inputmode="numeric" required autofocus>
-            
             <button type="submit" class="btn-verify">AUTHORIZE ACCESS</button>
         </form>
-        
+
         <div class="mt-4">
-            <a href="/login" class="text-info text-decoration-none small">← Back to credentials</a>
+            <a href="/login" class="text-info text-decoration-none small">&larr; Back to credentials</a>
         </div>
     </div>
 

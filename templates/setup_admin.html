@@ -110,6 +110,12 @@
                 <h3 class="fw-bold mb-3">First Admin Setup</h3>
                 <p class="text-white-50 small mb-4">Enter the account that should become the initial administrator.</p>
 
+                {% if admin_exists %}
+                <div class="alert alert-info border-0 mb-4">
+                    An admin account already exists. You can still use this page to create another admin account.
+                </div>
+                {% endif %}
+
                 <form action="/setup_admin" method="POST">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">

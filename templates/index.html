@@ -98,6 +98,55 @@
             box-shadow: 0 10px 30px rgba(0, 209, 255, 0.15);
         }
 
+        .detail-link {
+            color: var(--accent-blue);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+        }
+
+        .detail-link:hover { color: #8be9ff; }
+
+        .location-panel {
+            background: rgba(9, 12, 18, 0.8);
+            border: 1px solid rgba(0, 209, 255, 0.18);
+            border-radius: 28px;
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+        }
+
+        .location-map {
+            min-height: 420px;
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 209, 255, 0.22);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+        }
+
+        .location-map iframe {
+            width: 100%;
+            height: 100%;
+            min-height: 420px;
+            border: 0;
+            display: block;
+            filter: grayscale(0.1) contrast(1.05) brightness(0.9);
+        }
+
+        .location-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.55rem 0.9rem;
+            border-radius: 999px;
+            background: rgba(0, 209, 255, 0.08);
+            border: 1px solid rgba(0, 209, 255, 0.22);
+            color: #dffbff;
+            font-size: 0.8rem;
+            margin: 0.25rem 0.35rem 0 0;
+        }
+
         .accent-card {
             background: linear-gradient(135deg, #007bff 0%, #00d1ff 100%);
             color: white;
@@ -247,9 +296,9 @@
                             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-info"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M20 12h2"/><path d="M2" 12h2"/></svg>
                         </div>
                         <h2 class="display-6 fw-bold text-white">Semiconductors & VLSI</h2>
-                        <p class="text-white-50 mt-3">100% Proficiency in IC Design. We divide complex engineering tasks into simpler modules.</p>
+                        <p class="text-white-50 mt-3">{{ semiconductors_video.description if semiconductors_video else 'RTL design, verification, and timing-aware implementation for low-power silicon workflows.' }}</p>
                     </div>
-                    <div class="text-mono mt-3" style="font-size: 0.6rem; opacity: 0.5;">[ CLICK TO VIEW LAB SIMULATION ]</div>
+                    <a href="{{ url_for('portfolio_detail', slug='semiconductors') }}" class="detail-link mt-3 d-inline-block">[ LEARN ABOUT VLSI ]</a>
                 </div>
             </div>
 
@@ -265,58 +314,84 @@
                     </div>
                     {% endif %}
                     <h2 class="fw-bold mb-0">AI & Neural Networks</h2>
-                    <p class="small mt-2 opacity-75">85% Intelligence implementation. Focused on automation control.</p>
-                    <div class="text-mono mt-3" style="font-size: 0.6rem; opacity: 0.8;">[ WATCH AI CORE ]</div>
+                    <p class="small mt-2 opacity-75">{{ ai_video.description if ai_video else 'Inference pipelines and model-driven control tuned for real-world automation.' }}</p>
+                    <a href="{{ url_for('portfolio_detail', slug='ai') }}" class="detail-link mt-3 d-inline-block text-white">[ LEARN ABOUT AI ]</a>
                 </div>
             </div>
 
             <div class="col-md-4">
-                <a href="https://your-video-link.com" target="_blank" class="text-decoration-none">
-                    <div class="bento-card">
-                        {% set cloud_video = card_videos.get('cloud') %}
-                        {% if cloud_video %}
-                        <div class="card-video">
-                            <video class="w-100 h-100" autoplay muted loop playsinline>
-                                <source src="{{ cloud_video.url }}" type="video/mp4">
-                                Your browser does not support embedded videos.
-                            </video>
-                        </div>
-                        {% endif %}
-                        <h3 class="fw-bold text-white">Cloud & DevOps</h3>
-                        <p class="text-white-50 small">Automated production methods streamlining the lifecycle.</p>
+                <div class="bento-card">
+                    {% set cloud_video = card_videos.get('cloud') %}
+                    {% if cloud_video %}
+                    <div class="card-video">
+                        <video class="w-100 h-100" autoplay muted loop playsinline>
+                            <source src="{{ cloud_video.url }}" type="video/mp4">
+                            Your browser does not support embedded videos.
+                        </video>
                     </div>
-                </a>
+                    {% endif %}
+                    <h3 class="fw-bold text-white">Cloud & DevOps</h3>
+                    <p class="text-white-50 small">{{ cloud_video.description if cloud_video else 'Resilient multi-region delivery with CI/CD, observability, and rollback planning.' }}</p>
+                    <a href="{{ url_for('portfolio_detail', slug='cloud') }}" class="detail-link mt-2 d-inline-block">[ LEARN ABOUT CLOUD ]</a>
+                </div>
             </div>
 
             <div class="col-md-8">
-                <a href="https://your-video-link.com" target="_blank" class="text-decoration-none">
-                    <div class="bento-card">
-                        {% set process_video = card_videos.get('process') %}
-                        {% if process_video %}
-                        <div class="card-video">
-                            <video class="w-100 h-100" autoplay muted loop playsinline>
-                                <source src="{{ process_video.url }}" type="video/mp4">
-                                Your browser does not support embedded videos.
-                            </video>
-                        </div>
-                        {% endif %}
-                        <h3 class="fw-bold text-white">Process Automation</h3>
-                        <p class="text-white-50">Customized solutions across Automotive and Control Systems.</p>
+                <div class="bento-card">
+                    {% set process_video = card_videos.get('process') %}
+                    {% if process_video %}
+                    <div class="card-video">
+                        <video class="w-100 h-100" autoplay muted loop playsinline>
+                            <source src="{{ process_video.url }}" type="video/mp4">
+                            Your browser does not support embedded videos.
+                        </video>
                     </div>
-                </a>
+                    {% endif %}
+                    <h3 class="fw-bold text-white">Process Automation</h3>
+                    <p class="text-white-50">{{ process_video.description if process_video else 'Sensor-to-actuator control and production orchestration for stable operations.' }}</p>
+                    <a href="{{ url_for('portfolio_detail', slug='process') }}" class="detail-link mt-2 d-inline-block">[ LEARN ABOUT AUTOMATION ]</a>
+                </div>
             </div>
         </section>
 
         <section class="py-5 mb-5 reveal-hidden" id="about">
-            <div class="row">
-                <div class="col-lg-10">
+            <div class="row g-4 align-items-start">
+                <div class="col-lg-7">
                     <p class="text-mono mb-2">02 // About Us</p>
-                    <h2 class="fw-bold display-5 mb-4">Pragmatic • Professional • Progressive</h2>
-                    <p class="text-white-75" style="font-size: 1.1rem; line-height: 1.8;">
-                        Alstandesign enables technology through R&D, innovation, and disruption. 
-                        We adopt 3P's as our principle to deliver value through a combination of Pragmatic processes, 
-                        Professional people, and structured technologies.
+                    <h2 class="fw-bold display-5 mb-4">Pragmatic &bull; Professional &bull; Progressive</h2>
+                    <p class="text-white-75 mb-4" style="font-size: 1.1rem; line-height: 1.85;">
+                        Alstandesign is a multidisciplinary engineering organization focused on building
+                        dependable digital and hardware-driven solutions. We blend research, design, and
+                        execution to help teams move from idea to impact with clarity, speed, and precision.
                     </p>
+                    <p class="text-white-75 mb-4" style="font-size: 1.05rem; line-height: 1.8;">
+                        Our 3P philosophy keeps every engagement grounded in practical delivery, professional
+                        collaboration, and progressive thinking. That means we design systems that are
+                        maintainable, scalable, and ready for real-world use.
+                    </p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge rounded-pill border border-info text-info px-3 py-2">Engineering Strategy</span>
+                        <span class="badge rounded-pill border border-info text-info px-3 py-2">Product Development</span>
+                        <span class="badge rounded-pill border border-info text-info px-3 py-2">R&amp;D Delivery</span>
+                        <span class="badge rounded-pill border border-info text-info px-3 py-2">System Integration</span>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="bento-card p-4 h-100">
+                        <p class="text-mono mb-3">OUR FOCUS</p>
+                        <div class="mb-4">
+                            <h3 class="h5 fw-bold text-white mb-2">Pragmatic</h3>
+                            <p class="text-white-50 mb-0">We make decisions that balance speed, quality, and long-term maintainability.</p>
+                        </div>
+                        <div class="mb-4">
+                            <h3 class="h5 fw-bold text-white mb-2">Professional</h3>
+                            <p class="text-white-50 mb-0">We communicate clearly, deliver consistently, and keep execution structured.</p>
+                        </div>
+                        <div>
+                            <h3 class="h5 fw-bold text-white mb-2">Progressive</h3>
+                            <p class="text-white-50 mb-0">We adopt modern methods and technologies to keep solutions future-ready.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -338,24 +413,51 @@
         </section>
 
         <section class="container py-5 reveal-hidden" id="location">
-            <div class="row g-4 align-items-center">
-                <div class="col-lg-5">
-                    <p class="text-mono mb-2">04 // GLOBAL HEADQUARTERS</p>
-                    <h2 class="fw-bold mb-4">Visit Our Labs</h2>
-                    <div class="bento-card p-4">
-                        <p class="text-white-75 mb-4">
-                            <strong>Alstandesign Systems Pvt Ltd</strong><br>
-                            No. 51, 10th Cross, Sanjeevappa Layout,<br>
-                            CV Raman Nagar, Bengaluru,<br>
-                            Karnataka 560093, India
-                        </p>
-                        <a href="https://www.google.com/maps" target="_blank" class="btn btn-tech w-100 py-3">GET DIRECTIONS</a>
+            <div class="location-panel p-4 p-lg-5">
+                <div class="row g-4 align-items-stretch">
+                    <div class="col-lg-5 d-flex">
+                        <div class="bento-card p-4 h-100 w-100">
+                            <div>
+                                <p class="text-mono mb-2">04 // GLOBAL HEADQUARTERS</p>
+                                <h2 class="fw-bold mb-3">Visit Our Labs</h2>
+                                <p class="text-white-75 mb-4" style="line-height: 1.8;">
+                                    Find us at our Bengaluru engineering workspace. The map is centered on the full
+                                    postal address below so visitors can locate the exact office area with ease.
+                                </p>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="location-chip">Engineering Office</div>
+                                <div class="location-chip">CV Raman Nagar</div>
+                                <div class="location-chip">Bengaluru 560093</div>
+                            </div>
+
+                            <p class="text-white-75 mb-4">
+                                <strong class="text-white">Alstandesign Systems Pvt Ltd</strong><br>
+                                No. 51, 10th Cross, Sanjeevappa Layout,<br>
+                                CV Raman Nagar, Bengaluru,<br>
+                                Karnataka 560093, India
+                            </p>
+
+                            <a
+                                href="https://www.google.com/maps/search/?api=1&query=Alstandesign%20Systems%20Pvt%20Ltd%2C%20No.%2051%2C%2010th%20Cross%2C%20Sanjeevappa%20Layout%2C%20CV%20Raman%20Nagar%2C%20Bengaluru%2C%20Karnataka%20560093%2C%20India"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="btn btn-tech w-100 py-3"
+                            >
+                                OPEN EXACT LOCATION
+                            </a>
+                        </div>
                     </div>
-                </div>
-                <div class="col-lg-7">
-                    <div class="bento-card p-0 overflow-hidden" style="min-height: 350px;">
-                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3887.828574167123!2d77.66601427507655!3d12.98282368733364!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae111327777777%3A0x7777777777777777!2sCV%20Raman%20Nagar%2C%20Bengaluru!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin" 
-                            width="100%" height="350" style="border:0; filter: grayscale(1) invert(0.9);" allowfullscreen="" loading="lazy"></iframe>
+                    <div class="col-lg-7 d-flex">
+                        <div class="location-map w-100">
+                            <iframe
+                                src="https://www.google.com/maps?q=Alstandesign%20Systems%20Pvt%20Ltd%2C%20No.%2051%2C%2010th%20Cross%2C%20Sanjeevappa%20Layout%2C%20CV%20Raman%20Nagar%2C%20Bengaluru%2C%20Karnataka%20560093%2C%20India&output=embed"
+                                loading="lazy"
+                                referrerpolicy="no-referrer-when-downgrade"
+                                allowfullscreen
+                            ></iframe>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -7,8 +7,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root { --accent: #ffc107; --bg: #0b0e14; --card: #161b22; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; height: 100vh; margin: 0; overflow: hidden; }
-        .login-container { display: flex; height: 100vh; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; min-height: 100vh; margin: 0; overflow-x: hidden; }
+        .login-container { display: flex; min-height: 100vh; }
         .info-side {
             flex: 1;
             background: linear-gradient(rgba(11, 14, 20, 0.78), rgba(11, 14, 20, 0.86)),
@@ -22,6 +22,12 @@
         .info-side p { font-size: 1.1rem; color: rgba(255,255,255,0.7); max-width: 500px; line-height: 1.6; }
         .form-side { width: 450px; display: flex; align-items: center; justify-content: center; background: var(--bg); }
         .login-card { width: 100%; max-width: 350px; }
+        .helper-note {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
         .form-control {
             background: var(--card); border: 1px solid rgba(255,193,7,0.2);
             color: white; padding: 12px; margin-bottom: 20px;
@@ -53,18 +59,33 @@
     <div class="login-container">
         <div class="info-side">
             <span class="company-badge">Restricted Console</span>
-            <h1>ADMIN ACCESS</h1>
+            <h1>{% if admin_exists %}ADMIN ACCESS{% else %}ADMIN SIGN UP{% endif %}</h1>
             <p>
+                {% if admin_exists %}
                 This entry point is reserved for authorized administrators only.
-                Regular client accounts should use the standard login page and will be directed to the dashboard.
+                Use it to sign in and manage admin access.
+                {% else %}
+                Create the first administrator account here. After setup, the admin can log in from this same page.
+                {% endif %}
             </p>
         </div>
 
         <div class="form-side">
             <div class="login-card">
-                <h3 class="mb-4">Administrator Login</h3>
+                <h3 class="mb-4">
+                    {% if admin_exists %}Administrator Login{% else %}Create First Admin{% endif %}
+                </h3>
+                <p class="helper-note">
+                    {% if admin_exists %}
+                    Use your admin email and password, then complete 2FA verification.
+                    {% else %}
+                    This account will become the primary administrator for the system.
+                    {% endif %}
+                </p>
+
                 <form action="/admin_login" method="POST">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    {% if admin_exists %}
                     <div class="mb-3">
                         <label class="form-label small text-white-50">Admin Email</label>
                         <input type="email" name="email" class="form-control" placeholder="admin@company.com" required>
@@ -74,9 +95,32 @@
                         <input type="password" name="password" class="form-control" placeholder="********" required>
                     </div>
                     <button type="submit" class="btn-login">VERIFY ADMIN ACCESS</button>
+                    {% else %}
+                    <div class="mb-3">
+                        <label class="form-label small text-white-50">Full Name</label>
+                        <input type="text" name="username" class="form-control" placeholder="Admin Name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small text-white-50">Admin Email</label>
+                        <input type="email" name="email" class="form-control" placeholder="admin@company.com" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label small text-white-50">Password</label>
+                        <input type="password" name="password" class="form-control" placeholder="********" required>
+                    </div>
+                    <button type="submit" class="btn-login">CREATE ADMIN</button>
+                    {% endif %}
                 </form>
+                {% if admin_exists %}
                 <p class="mt-4 small text-center text-white-50">
-                    Client account? <a href="/login" style="color: var(--accent); text-decoration: none;">Go to client login</a>
+                    Use this page only for administrator access.
+                </p>
+                {% endif %}
+                <p class="mt-2 small text-center text-white-50">
+                    First admin setup? <a href="/setup_admin" style="color: var(--accent); text-decoration: none;">Sign up here</a>
+                </p>
+                <p class="mt-2 small text-center text-white-50">
+                    <a href="{{ url_for('forgot_password') }}" style="color: var(--accent); text-decoration: none;">Forgot Password?</a>
                 </p>
             </div>
         </div>

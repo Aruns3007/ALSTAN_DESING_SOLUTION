@@ -55,27 +55,75 @@ VIDEOS_DIR = os.path.join(os.path.dirname(__file__), "videos")
 VIDEO_ASSETS = {
     "semiconductors": {
         "filename": "WhatsApp Video 2026-04-04 at 1.41.49 PM.mp4",
-        "title": "AI Signal Scaffold",
-        "description": "Early-stage AI signal processing stack for semiconductor metrology.",
-        "badge": "AI R&D",
+        "title": "Semiconductors & VLSI",
+        "description": "RTL design, verification, and timing-aware implementation for low-power silicon workflows.",
+        "badge": "IC Design",
+        "summary": "A focused look at chip design, verification, and silicon-ready implementation.",
+        "hero_image": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=1600",
+        "gallery": [
+            "https://images.unsplash.com/photo-1518779578993-ec3579fee39f?auto=format&fit=crop&q=80&w=1200",
+            "https://images.unsplash.com/photo-1553484771-cc0d9b8c5a0f?auto=format&fit=crop&q=80&w=1200",
+            "https://images.unsplash.com/photo-1581092921461-39b9d9c1b4b6?auto=format&fit=crop&q=80&w=1200",
+        ],
+        "highlights": [
+            "RTL and block-level design flow",
+            "Verification and timing awareness",
+            "Low-power implementation mindset",
+        ],
     },
     "ai": {
         "filename": "WhatsApp Video 2026-04-08 at 12.07.42 PM.mp4",
         "title": "AI & Neural Networks",
-        "description": "A focused AI and neural-network showcase for the featured card.",
+        "description": "Inference pipelines and model-driven control tuned for real-world automation.",
         "badge": "AI Core",
+        "summary": "How model-driven logic can be applied to practical decision systems.",
+        "hero_image": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=1600",
+        "gallery": [
+            "https://images.unsplash.com/photo-1526379095098-d400fd0bf935?auto=format&fit=crop&q=80&w=1200",
+            "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&q=80&w=1200",
+            "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1200",
+        ],
+        "highlights": [
+            "Inference pipeline thinking",
+            "Automation-assisted decision support",
+            "Real-world deployment focus",
+        ],
     },
     "cloud": {
         "filename": "Next-Gen Cloud Infrastructure Demo_720p_caption.mp4",
-        "title": "Cloud Infrastructure Demo",
-        "description": "Walkthrough of our resilient multi-region fabric with orchestration telemetry.",
+        "title": "Cloud & DevOps",
+        "description": "Resilient multi-region delivery with CI/CD, observability, and rollback planning.",
         "badge": "Cloud Systems",
+        "summary": "A practical view of delivery pipelines, monitoring, and resilience.",
+        "hero_image": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=1600",
+        "gallery": [
+            "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&q=80&w=1200",
+            "https://images.unsplash.com/photo-1484417894907-623942c8ee29?auto=format&fit=crop&q=80&w=1200",
+            "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1200",
+        ],
+        "highlights": [
+            "CI/CD and release control",
+            "Monitoring and observability",
+            "Multi-region resilience planning",
+        ],
     },
     "process": {
         "filename": "Cyan Precision Automation_720p_caption.mp4",
-        "title": "Physics-Control Automation",
-        "description": "Real-time automation showcase from our labs, highlighting sensor-to-actuator loops.",
+        "title": "Process Automation",
+        "description": "Sensor-to-actuator control and production orchestration for stable operations.",
         "badge": "Automation",
+        "summary": "A concise look at control loops and automation for production systems.",
+        "hero_image": "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=1600",
+        "gallery": [
+            "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&q=80&w=1200",
+            "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&q=80&w=1200",
+            "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&q=80&w=1200",
+        ],
+        "highlights": [
+            "Sensor-to-actuator control",
+            "Process monitoring and tuning",
+            "Stable production operations",
+        ],
     },
 }
 ALLOWED_VIDEO_FILENAMES = {asset["filename"] for asset in VIDEO_ASSETS.values()}
@@ -563,6 +611,67 @@ def _mark_failed_login(conn, user):
     conn.commit()
 
 
+def _create_user_account(conn, username, email, password, role):
+    existing_user = conn.execute(
+        "SELECT id FROM users WHERE email = ?",
+        (email,),
+    ).fetchone()
+    if existing_user:
+        return None
+
+    otp_secret = pyotp.random_base32()
+    password_hash = hash_password(password)
+
+    conn.execute(
+        """
+        INSERT INTO users (username, email, password, password_hash, otp_secret, role, is_verified)
+        VALUES (?, ?, ?, ?, ?, ?, 0)
+        """,
+        (username, email, password_hash, password_hash, otp_secret, role),
+    )
+    conn.commit()
+    return conn.execute("SELECT last_insert_rowid() AS id").fetchone()["id"]
+
+
+def _promote_user_to_admin(conn, user_id):
+    return conn.execute(
+        "UPDATE users SET role = 'admin' WHERE id = ? AND LOWER(COALESCE(role, 'user')) <> 'admin'",
+        (user_id,),
+    ).rowcount
+
+
+def _handle_admin_signup():
+    username = normalize_username(request.form.get("username"))
+    email = normalize_email(request.form.get("email"))
+    password = request.form.get("password") or ""
+
+    if not validate_username(username):
+        flash("Please enter a valid full name.", "danger")
+        return render_template("admin_login.html", admin_exists=False)
+    if not validate_email(email):
+        flash("Please enter a valid email address.", "danger")
+        return render_template("admin_login.html", admin_exists=False)
+
+    password_ok, password_message = validate_password_strength(password)
+    if not password_ok:
+        flash(password_message, "danger")
+        return render_template("admin_login.html", admin_exists=False)
+
+    conn = get_db_connection()
+    try:
+        user_id = _create_user_account(conn, username, email, password, "admin")
+        if user_id is None:
+            flash("Email already registered. Please choose another email.", "danger")
+            return render_template("admin_login.html", admin_exists=False)
+
+        session["pending_registration_user_id"] = user_id
+        session["pending_registration_username"] = username
+        flash("Admin account created. Complete 2FA setup to finish.", "success")
+        return redirect(url_for("setup_2fa"))
+    finally:
+        conn.close()
+
+
 def _unlock_if_expired(conn, user):
     lockout_until = _parse_dt(user["lockout_until"])
     if not lockout_until:
@@ -598,6 +707,24 @@ def serve_video(filename):
     return send_from_directory(VIDEOS_DIR, filename)
 
 
+@app.route("/portfolio/<slug>")
+def portfolio_detail(slug):
+    asset = VIDEO_ASSETS.get(slug)
+    if not asset:
+        abort(404)
+
+    video_asset = {
+        **asset,
+        "url": url_for("serve_video", filename=asset["filename"]),
+    }
+    return render_template(
+        "portfolio_detail.html",
+        asset=asset,
+        video_asset=video_asset,
+        portfolio_slug=slug,
+    )
+
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
@@ -619,27 +746,10 @@ def register():
 
         conn = get_db_connection()
         try:
-            existing_user = conn.execute(
-                "SELECT id FROM users WHERE email = ?",
-                (email,),
-            ).fetchone()
-            if existing_user:
+            user_id = _create_user_account(conn, username, email, password, "user")
+            if user_id is None:
                 flash("Email already registered. Please login.", "danger")
                 return redirect(url_for("login"))
-
-            otp_secret = pyotp.random_base32()
-            password_hash = hash_password(password)
-            role = "user"
-
-            conn.execute(
-                """
-                INSERT INTO users (username, email, password, password_hash, otp_secret, role, is_verified)
-                VALUES (?, ?, ?, ?, ?, ?, 0)
-                """,
-                (username, email, password_hash, password_hash, otp_secret, role),
-            )
-            user_id = conn.execute("SELECT last_insert_rowid() AS id").fetchone()["id"]
-            conn.commit()
 
             session["pending_registration_user_id"] = user_id
             session["pending_registration_username"] = username
@@ -689,7 +799,14 @@ def setup_2fa(username):
     session["pending_registration_user_id"] = user["id"]
     session["pending_registration_username"] = user["username"]
 
-    return render_template("verify.html", qr_code=qr_b64, username=user["username"])
+    return render_template(
+        "verify.html",
+        qr_code=qr_b64,
+        username=user["username"],
+        setup_key=user["otp_secret"],
+        issuer_name="AlstanDesign",
+        provisioning_url=provisioning_url,
+    )
 
 
 @app.route("/verify", methods=["POST"])
@@ -788,22 +905,74 @@ def login():
     return render_template("login.html")
 
 
+@app.route("/forgot_password", methods=["GET", "POST"])
+def forgot_password():
+    if request.method == "POST":
+        email = normalize_email(request.form.get("email"))
+        if not validate_email(email):
+            flash("Please enter a valid email address.", "danger")
+            return render_template("forgot_password.html")
+
+        user = get_user_by_email(email)
+        # Only allow reset for verified users with MFA configured
+        if user and user["otp_secret"] and user["is_verified"] == 1:
+            _start_pending_mfa(user, "reset_password")
+            flash("Identity verification required. Please enter your 2FA code.", "info")
+            return redirect(url_for("login_otp"))
+
+        # Generic message to prevent account enumeration
+        flash("If an account exists with that email, a reset process has started via MFA.", "info")
+        return redirect(url_for("login"))
+
+    return render_template("forgot_password.html")
+
+
+@app.route("/reset_password", methods=["GET", "POST"])
+def reset_password():
+    user_id = session.get("reset_password_user_id")
+    if not user_id:
+        flash("Unauthorized access. Please use the forgot password form.", "danger")
+        return redirect(url_for("forgot_password"))
+
+    if request.method == "POST":
+        password = request.form.get("password") or ""
+        ok, msg = validate_password_strength(password)
+        if not ok:
+            flash(msg, "danger")
+            return render_template("reset_password.html")
+
+        conn = get_db_connection()
+        try:
+            hashed = hash_password(password)
+            conn.execute("UPDATE users SET password_hash = ?, password = ? WHERE id = ?", (hashed, hashed, user_id))
+            conn.commit()
+            session.pop("reset_password_user_id", None)
+            flash("Password updated successfully. Please log in.", "success")
+            return redirect(url_for("login"))
+        finally:
+            conn.close()
+
+    return render_template("reset_password.html")
+
+
 @app.route("/admin_login", methods=["GET", "POST"])
 def admin_login():
-    if not _admin_account_exists():
-        return redirect(url_for("setup_admin"))
+    admin_exists = _admin_account_exists()
 
     current_user = get_current_user()
     if request.method == "GET" and current_user and is_admin(current_user) and session.get("admin_authenticated"):
         return redirect(url_for("admin_panel"))
 
     if request.method == "POST":
+        if not admin_exists:
+            return _handle_admin_signup()
+
         email = normalize_email(request.form.get("email"))
         password = request.form.get("password") or ""
 
         if not validate_email(email):
             flash("Please enter a valid email address.", "danger")
-            return render_template("admin_login.html")
+            return render_template("admin_login.html", admin_exists=True)
 
         conn = get_db_connection()
         try:
@@ -819,86 +988,37 @@ def admin_login():
 
             if not user or not is_admin(user):
                 flash("Admin access denied.", "danger")
-                return render_template("admin_login.html")
+                return render_template("admin_login.html", admin_exists=True)
 
             if _unlock_if_expired(conn, user):
-                return render_template("admin_login.html")
+                return render_template("admin_login.html", admin_exists=True)
 
             if not _password_matches_and_upgrade(conn, user, password):
                 _mark_failed_login(conn, user)
                 flash("Invalid admin credentials.", "danger")
-                return render_template("admin_login.html")
+                return render_template("admin_login.html", admin_exists=True)
 
             _clear_login_failures(conn, user["id"])
 
             if user["is_verified"] == 0 or not user["otp_secret"]:
                 flash("Admin account requires 2FA setup before access.", "warning")
-                return render_template("admin_login.html")
+                return render_template("admin_login.html", admin_exists=True)
 
             _start_pending_mfa(user, "admin_panel")
             return redirect(url_for("login_otp"))
         finally:
             conn.close()
 
-    return render_template("admin_login.html")
+    return render_template("admin_login.html", admin_exists=admin_exists)
 
 
 @app.route("/setup_admin", methods=["GET", "POST"])
 def setup_admin():
-    if _admin_account_exists():
-        flash("An admin account already exists. Please use admin login.", "info")
-        return redirect(url_for("admin_login"))
-
+    admin_exists = _admin_account_exists()
     if request.method == "POST":
-        username = normalize_username(request.form.get("username"))
-        email = normalize_email(request.form.get("email"))
-        password = request.form.get("password") or ""
+        return _handle_admin_signup()
 
-        if not validate_username(username):
-            flash("Please enter a valid full name.", "danger")
-            return render_template("setup_admin.html")
-        if not validate_email(email):
-            flash("Please enter a valid email address.", "danger")
-            return render_template("setup_admin.html")
-
-        password_ok, password_message = validate_password_strength(password)
-        if not password_ok:
-            flash(password_message, "danger")
-            return render_template("setup_admin.html")
-
-        conn = get_db_connection()
-        try:
-            existing_user = conn.execute(
-                "SELECT id FROM users WHERE email = ?",
-                (email,),
-            ).fetchone()
-            if existing_user:
-                flash("Email already registered. Please choose another email.", "danger")
-                return render_template("setup_admin.html")
-
-            otp_secret = pyotp.random_base32()
-            password_hash = hash_password(password)
-            conn.execute(
-                """
-                INSERT INTO users (username, email, password, password_hash, otp_secret, role, is_verified)
-                VALUES (?, ?, ?, ?, ?, 'admin', 0)
-                """,
-                (username, email, password_hash, password_hash, otp_secret),
-            )
-            user_id = conn.execute("SELECT last_insert_rowid() AS id").fetchone()["id"]
-            conn.commit()
-
-            session["pending_registration_user_id"] = user_id
-            session["pending_registration_username"] = username
-            flash("Admin account created. Complete 2FA setup to finish.", "success")
-            return redirect(url_for("setup_2fa"))
-        except sqlite3.IntegrityError:
-            flash("Email already registered. Please choose another email.", "danger")
-            return render_template("setup_admin.html")
-        finally:
-            conn.close()
-
-    return render_template("setup_admin.html")
+    return render_template("setup_admin.html", admin_exists=admin_exists)
 
 
 @app.route("/login_otp")
@@ -932,7 +1052,13 @@ def login_verify():
     totp = pyotp.TOTP(user["otp_secret"])
     if totp.verify(user_code, valid_window=1):
         target = session.get("pending_mfa_target") or "dashboard"
+        uid = user["id"]
         clear_pending_auth_state()
+
+        if target == "reset_password":
+            session["reset_password_user_id"] = uid
+            return redirect(url_for("reset_password"))
+
         session["user"] = user["username"]
 
         if target == "admin_panel" and not is_admin(user):
@@ -1012,6 +1138,74 @@ def admin_panel():
     return render_template("admin.html", users=users, inquiries=inquiries, current_user=get_current_user())
 
 
+@app.route("/admin_create_user", methods=["POST"])
+@admin_required
+def admin_create_user():
+    username = normalize_username(request.form.get("username"))
+    email = normalize_email(request.form.get("email"))
+    password = request.form.get("password") or ""
+
+    if not validate_username(username):
+        flash("Please enter a valid full name.", "danger")
+        return redirect(url_for("admin_panel"))
+    if not validate_email(email):
+        flash("Please enter a valid email address.", "danger")
+        return redirect(url_for("admin_panel"))
+
+    password_ok, password_message = validate_password_strength(password)
+    if not password_ok:
+        flash(password_message, "danger")
+        return redirect(url_for("admin_panel"))
+
+    conn = get_db_connection()
+    try:
+        user_id = _create_user_account(conn, username, email, password, "user")
+        if user_id is None:
+            flash("Email already registered. Please choose another email.", "danger")
+            return redirect(url_for("admin_panel"))
+
+        flash("User created successfully.", "success")
+        return redirect(url_for("admin_panel"))
+    finally:
+        conn.close()
+
+
+@app.route("/promote_admin", methods=["POST"])
+@admin_required
+def promote_admin_by_email():
+    email = normalize_email(request.form.get("email"))
+
+    if not validate_email(email):
+        flash("Please enter a valid email address.", "danger")
+        return redirect(url_for("admin_panel"))
+
+    current_user = get_current_user()
+    conn = get_db_connection()
+    try:
+        user = conn.execute(
+            "SELECT id, username, role FROM users WHERE email = ?",
+            (email,),
+        ).fetchone()
+
+        if not user:
+            flash("User not found.", "warning")
+            return redirect(url_for("admin_panel"))
+
+        if current_user and int(current_user["id"]) == int(user["id"]):
+            flash("You are already using your own admin session.", "info")
+            return redirect(url_for("admin_panel"))
+
+        updated = _promote_user_to_admin(conn, user["id"])
+        if updated:
+            conn.commit()
+            flash(f"{user['username']} promoted to admin successfully.", "success")
+        else:
+            flash("User is already an admin.", "warning")
+        return redirect(url_for("admin_panel"))
+    finally:
+        conn.close()
+
+
 @app.route("/delete_user/<int:user_id>", methods=["POST"])
 @admin_required
 def delete_user(user_id):
@@ -1040,10 +1234,7 @@ def make_admin(user_id):
         return redirect(url_for("admin_panel"))
 
     conn = get_db_connection()
-    updated = conn.execute(
-        "UPDATE users SET role = 'admin' WHERE id = ? AND LOWER(COALESCE(role, 'user')) <> 'admin'",
-        (user_id,),
-    ).rowcount
+    updated = _promote_user_to_admin(conn, user_id)
     conn.commit()
     conn.close()
     if updated:

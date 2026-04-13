@@ -13,6 +13,21 @@
         .btn-verify { background: #00D1FF; color: black; font-weight: bold; border-radius: 50px; width: 100%; padding: 15px; border: none; cursor: pointer; transition: 0.3s; }
         .btn-verify:hover { background: #008fb3; transform: scale(1.02); }
         p { color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; line-height: 1.4; }
+        .setup-key {
+            background: rgba(0, 209, 255, 0.08);
+            border: 1px solid rgba(0, 209, 255, 0.22);
+            border-radius: 12px;
+            padding: 14px;
+            margin: 18px 0 22px;
+            text-align: left;
+        }
+        .setup-key code {
+            display: block;
+            color: #00D1FF;
+            font-size: 1rem;
+            word-break: break-all;
+            margin-top: 8px;
+        }
     </style>
 </head>
 <body>
@@ -30,10 +45,16 @@
     {% endwith %}
     <div class="otp-card">
         <h2 style="color: #00D1FF; margin-bottom: 10px;">SECURE SYNC</h2>
-        <p>Scan this QR code with <b>Google Authenticator</b> to link your device.</p>
-        
+        <p>Scan this QR code with any TOTP authenticator app to link your device.</p>
+
         <div class="qr-container">
             <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code">
+        </div>
+
+        <div class="setup-key">
+            <div class="small text-white-50">Manual setup key</div>
+            <code>{{ setup_key }}</code>
+            <p class="mb-0 mt-2">If your app cannot scan QR codes, enter this key manually with issuer <b>{{ issuer_name }}</b>.</p>
         </div>
 
         <form action="/verify" method="POST">

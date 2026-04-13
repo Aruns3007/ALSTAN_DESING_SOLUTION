@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ asset.title }} | Alstandesign</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0e14;
+            --card: rgba(22, 27, 34, 0.82);
+            --accent: #00d1ff;
+            --text: #ffffff;
+            --muted: rgba(255, 255, 255, 0.72);
+        }
+
+        body {
+            margin: 0;
+            background:
+                linear-gradient(rgba(11, 14, 20, 0.82), rgba(11, 14, 20, 0.94)),
+                url('{{ asset.hero_image | safe }}');
+            background-size: cover;
+            background-position: center;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+
+        .shell {
+            min-height: 100vh;
+            padding: 28px 0 56px;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent);
+            font-size: 0.72rem;
+        }
+
+        .panel {
+            background: var(--card);
+            border: 1px solid rgba(0, 209, 255, 0.14);
+            border-radius: 28px;
+            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(14px);
+        }
+
+        .hero-card {
+            overflow: hidden;
+        }
+
+        .hero-image {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+            display: block;
+        }
+
+        .section-title {
+            font-weight: 900;
+            letter-spacing: -0.04em;
+        }
+
+        .muted {
+            color: var(--muted);
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .feature-list li {
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .feature-list li:last-child {
+            border-bottom: 0;
+        }
+
+        .video-shell {
+            background: rgba(0, 0, 0, 0.28);
+            border-radius: 22px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 209, 255, 0.12);
+        }
+
+        .video-shell video {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gallery-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 18px;
+            display: block;
+        }
+
+        .gallery-card {
+            overflow: hidden;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            min-height: 220px;
+        }
+
+        .btn-tech {
+            background: var(--accent);
+            color: #00131a;
+            font-weight: 800;
+            border: none;
+            border-radius: 999px;
+            padding: 12px 22px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-tech:hover {
+            color: #00131a;
+            filter: brightness(0.95);
+        }
+
+        @media (max-width: 768px) {
+            .shell {
+                padding: 18px 0 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <div class="container">
+            <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+                <div>
+                    <div class="mono mb-2">{{ asset.badge }}</div>
+                    <h1 class="section-title mb-0">{{ asset.title }}</h1>
+                </div>
+                <a href="{{ url_for('index') }}#portfolio" class="btn-tech">Back to Portfolio</a>
+            </div>
+
+            <section class="panel hero-card mb-4">
+                <img src="{{ asset.hero_image }}" alt="{{ asset.title }}" class="hero-image">
+                <div class="p-4 p-lg-5">
+                    <p class="mono mb-2">Overview</p>
+                    <p class="lead mb-3" style="color: rgba(255,255,255,0.92); max-width: 900px;">
+                        {{ asset.summary }}
+                    </p>
+                    <p class="muted mb-0" style="max-width: 900px;">
+                        {{ asset.description }}
+                    </p>
+                </div>
+            </section>
+
+            <div class="row g-4 mb-4">
+                <div class="col-lg-7">
+                    <div class="panel p-4 h-100">
+                        <p class="mono mb-3">Live Clip</p>
+                        <div class="video-shell">
+                            <video autoplay muted loop playsinline>
+                                <source src="{{ video_asset.url }}" type="video/mp4">
+                                Your browser does not support embedded videos.
+                            </video>
+                        </div>
+                        <p class="muted mt-3 mb-0">
+                            This live clip shows the current focus area in motion so users can understand the system context quickly.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="panel p-4 h-100">
+                        <p class="mono mb-3">What To Know</p>
+                        <ul class="feature-list">
+                            {% for item in asset.highlights %}
+                            <li>{{ item }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <section class="panel p-4 p-lg-5 mb-4">
+                <p class="mono mb-3">Live Images</p>
+                <div class="row g-3">
+                    {% for image in asset.gallery %}
+                    <div class="col-md-4">
+                        <div class="gallery-card">
+                            <img src="{{ image }}" alt="{{ asset.title }} gallery image" class="gallery-image">
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="panel p-4 p-lg-5">
+                <div class="row align-items-center g-4">
+                    <div class="col-lg-8">
+                        <p class="mono mb-2">Brief Note</p>
+                        <h2 class="section-title mb-3">A quick reference page for {{ asset.title }}</h2>
+                        <p class="muted mb-0">
+                            This page is meant to help users understand the scope before they reach out. It combines a short summary, a moving visual, and live image references so the card feels useful even before any contact is made.
+                        </p>
+                    </div>
+                    <div class="col-lg-4 text-lg-end">
+                        <a href="{{ url_for('index') }}#portfolio" class="btn-tech">Return to Main View</a>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
