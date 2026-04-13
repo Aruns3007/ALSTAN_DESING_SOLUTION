@@ -18,7 +18,7 @@
 
         body {
             background-image: linear-gradient(rgba(11, 14, 20, 0.8), rgba(11, 14, 20, 0.8)), 
-                              url('https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=2070');
+                              url('{{ url_for('serve_image', filename='20260413_1202_image.png') }}');
             background-attachment: fixed;
             background-size: cover;
             background-position: center;
@@ -206,6 +206,22 @@
             box-shadow: 0 0 40px rgba(0, 209, 255, 0.08);
         }
 
+        .reference-card {
+            background: rgba(22, 27, 34, 0.72);
+            border: 1px solid rgba(0, 209, 255, 0.16);
+            border-radius: 24px;
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+            height: 100%;
+        }
+
+        .reference-image {
+            width: 100%;
+            aspect-ratio: 16 / 11;
+            object-fit: cover;
+            display: block;
+        }
+
         .logo-glow { height: 50px; width: auto; filter: drop-shadow(0 0 10px rgba(0, 209, 255, 0.7)); transition: 0.3s; vertical-align: middle; }
         @media (min-width: 768px) { .logo-glow { height: 80px; } }
     </style>
@@ -277,6 +293,49 @@
                 The difference comes down to our knowledge of structure and flow. At Alstandesign, we follow a rigorous five-step model: 
                 Inquiry, Hypothesis, Body Architecture, Supporting Arguments, and Scalable Conclusion.
             </p>
+        </section>
+
+        <section class="py-5 mb-5 reveal-hidden" id="reference">
+            <p class="text-mono mb-2">01A // Visual Reference</p>
+            <h2 class="fw-bold display-5 mb-4">What Each Domain Looks Like</h2>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="reference-card">
+                        <img src="{{ url_for('serve_image', filename='20260413_1202_image.png') }}" alt="Semiconductors and VLSI reference image" class="reference-image">
+                        <div class="p-3">
+                            <h3 class="h5 fw-bold text-white mb-1">Semiconductors</h3>
+                            <p class="text-white-50 small mb-0">Chip design, silicon thinking, and hardware-aware engineering.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="reference-card">
+                        <img src="{{ url_for('serve_image', filename='Gemini_Generated_Image_i4si37i4si37i4si.png') }}" alt="AI and neural networks reference image" class="reference-image">
+                        <div class="p-3">
+                            <h3 class="h5 fw-bold text-white mb-1">AI Systems</h3>
+                            <p class="text-white-50 small mb-0">Model-driven decision making and intelligent automation.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="reference-card">
+                        <img src="{{ url_for('serve_image', filename='Gemini_Generated_Image_bhqe6bbhqe6bbhqe.png') }}" alt="Cloud infrastructure reference image" class="reference-image">
+                        <div class="p-3">
+                            <h3 class="h5 fw-bold text-white mb-1">Cloud Ops</h3>
+                            <p class="text-white-50 small mb-0">Infrastructure flow, distributed systems, and resilience.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="reference-card">
+                        <img src="{{ url_for('serve_image', filename='Gemini_Generated_Image_egpoacegpoacegpo.png') }}" alt="Process automation reference image" class="reference-image">
+                        <div class="p-3">
+                            <h3 class="h5 fw-bold text-white mb-1">Automation</h3>
+                            <p class="text-white-50 small mb-0">Control loops, monitoring, and production orchestration.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <section class="row g-4 mb-5 reveal-hidden" id="portfolio">

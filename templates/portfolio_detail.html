@@ -106,6 +106,12 @@
             display: block;
         }
 
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
         .gallery-card {
             overflow: hidden;
             border-radius: 20px;
@@ -192,12 +198,10 @@
 
             <section class="panel p-4 p-lg-5 mb-4">
                 <p class="mono mb-3">Live Images</p>
-                <div class="row g-3">
+                <div class="gallery-grid">
                     {% for image in asset.gallery %}
-                    <div class="col-md-4">
-                        <div class="gallery-card">
-                            <img src="{{ image }}" alt="{{ asset.title }} gallery image" class="gallery-image">
-                        </div>
+                    <div class="gallery-card">
+                        <img src="{{ image }}" alt="{{ asset.title }} gallery image" class="gallery-image">
                     </div>
                     {% endfor %}
                 </div>

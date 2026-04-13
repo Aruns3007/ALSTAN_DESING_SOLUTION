@@ -52,6 +52,7 @@ PASSWORD_MIN_LENGTH = 8
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "alstandesign.db")
 VIDEOS_DIR = os.path.join(os.path.dirname(__file__), "videos")
+IMAGES_DIR = os.path.join(os.path.dirname(__file__), "images")
 VIDEO_ASSETS = {
     "semiconductors": {
         "filename": "WhatsApp Video 2026-04-04 at 1.41.49 PM.mp4",
@@ -59,11 +60,10 @@ VIDEO_ASSETS = {
         "description": "RTL design, verification, and timing-aware implementation for low-power silicon workflows.",
         "badge": "IC Design",
         "summary": "A focused look at chip design, verification, and silicon-ready implementation.",
-        "hero_image": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=1600",
+        "hero_image": "20260413_1202_image.png",
         "gallery": [
-            "https://images.unsplash.com/photo-1518779578993-ec3579fee39f?auto=format&fit=crop&q=80&w=1200",
-            "https://images.unsplash.com/photo-1553484771-cc0d9b8c5a0f?auto=format&fit=crop&q=80&w=1200",
-            "https://images.unsplash.com/photo-1581092921461-39b9d9c1b4b6?auto=format&fit=crop&q=80&w=1200",
+            "20260413_1202_image (1).png",
+            "20260413_1202_image (2).png",
         ],
         "highlights": [
             "RTL and block-level design flow",
@@ -77,11 +77,10 @@ VIDEO_ASSETS = {
         "description": "Inference pipelines and model-driven control tuned for real-world automation.",
         "badge": "AI Core",
         "summary": "How model-driven logic can be applied to practical decision systems.",
-        "hero_image": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=1600",
+        "hero_image": "Gemini_Generated_Image_i4si37i4si37i4si.png",
         "gallery": [
-            "https://images.unsplash.com/photo-1526379095098-d400fd0bf935?auto=format&fit=crop&q=80&w=1200",
-            "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&q=80&w=1200",
-            "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=1200",
+            "Gemini_Generated_Image_f69xbdf69xbdf69x.png",
+            "Gemini_Generated_Image_tk81lqtk81lqtk81.png",
         ],
         "highlights": [
             "Inference pipeline thinking",
@@ -95,11 +94,9 @@ VIDEO_ASSETS = {
         "description": "Resilient multi-region delivery with CI/CD, observability, and rollback planning.",
         "badge": "Cloud Systems",
         "summary": "A practical view of delivery pipelines, monitoring, and resilience.",
-        "hero_image": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=1600",
+        "hero_image": "Gemini_Generated_Image_bhqe6bbhqe6bbhqe.png",
         "gallery": [
-            "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&q=80&w=1200",
-            "https://images.unsplash.com/photo-1484417894907-623942c8ee29?auto=format&fit=crop&q=80&w=1200",
-            "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1200",
+            "Gemini_Generated_Image_heu8ztheu8ztheu8.png",
         ],
         "highlights": [
             "CI/CD and release control",
@@ -113,11 +110,9 @@ VIDEO_ASSETS = {
         "description": "Sensor-to-actuator control and production orchestration for stable operations.",
         "badge": "Automation",
         "summary": "A concise look at control loops and automation for production systems.",
-        "hero_image": "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=1600",
+        "hero_image": "Gemini_Generated_Image_egpoacegpoacegpo.png",
         "gallery": [
-            "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&q=80&w=1200",
-            "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&q=80&w=1200",
-            "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&q=80&w=1200",
+            "Gemini_Generated_Image_lsy778lsy778lsy7.png",
         ],
         "highlights": [
             "Sensor-to-actuator control",
@@ -127,6 +122,14 @@ VIDEO_ASSETS = {
     },
 }
 ALLOWED_VIDEO_FILENAMES = {asset["filename"] for asset in VIDEO_ASSETS.values()}
+ALLOWED_IMAGE_FILENAMES = {
+    asset["hero_image"]
+    for asset in VIDEO_ASSETS.values()
+} | {
+    image
+    for asset in VIDEO_ASSETS.values()
+    for image in asset["gallery"]
+}
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 USERNAME_RE = re.compile(r"^[A-Za-z0-9 .,'\-]{2,80}$")
@@ -568,7 +571,12 @@ def add_security_headers(response):
 
 def _build_video_assets():
     return {
-        key: {**asset, "url": url_for("serve_video", filename=asset["filename"])}
+        key: {
+            **asset,
+            "url": url_for("serve_video", filename=asset["filename"]),
+            "hero_image": url_for("serve_image", filename=asset["hero_image"]),
+            "gallery": [url_for("serve_image", filename=image) for image in asset["gallery"]],
+        }
         for key, asset in VIDEO_ASSETS.items()
     }
 
@@ -707,15 +715,21 @@ def serve_video(filename):
     return send_from_directory(VIDEOS_DIR, filename)
 
 
+@app.route("/images/<path:filename>")
+def serve_image(filename):
+    if filename not in ALLOWED_IMAGE_FILENAMES:
+        abort(404)
+    return send_from_directory(IMAGES_DIR, filename)
+
+
 @app.route("/portfolio/<slug>")
 def portfolio_detail(slug):
-    asset = VIDEO_ASSETS.get(slug)
+    asset = _build_video_assets().get(slug)
     if not asset:
         abort(404)
 
     video_asset = {
         **asset,
-        "url": url_for("serve_video", filename=asset["filename"]),
     }
     return render_template(
         "portfolio_detail.html",
