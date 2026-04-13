@@ -94,9 +94,10 @@ VIDEO_ASSETS = {
         "description": "Resilient multi-region delivery with CI/CD, observability, and rollback planning.",
         "badge": "Cloud Systems",
         "summary": "A practical view of delivery pipelines, monitoring, and resilience.",
-        "hero_image": "Gemini_Generated_Image_bhqe6bbhqe6bbhqe.png",
+        "hero_image": "Gemini_Generated_Image_heu8ztheu8ztheu8.png",
         "gallery": [
-            "Gemini_Generated_Image_heu8ztheu8ztheu8.png",
+            "Gemini_Generated_Image_bhqe6bbhqe6bbhqe.png",
+            "Gemini_Generated_Image_lsy778lsy778lsy7.png",
         ],
         "highlights": [
             "CI/CD and release control",
@@ -112,7 +113,7 @@ VIDEO_ASSETS = {
         "summary": "A concise look at control loops and automation for production systems.",
         "hero_image": "Gemini_Generated_Image_egpoacegpoacegpo.png",
         "gallery": [
-            "Gemini_Generated_Image_lsy778lsy778lsy7.png",
+            "Gemini_Generated_Image_tk81lqtk81lqtk81.png",
         ],
         "highlights": [
             "Sensor-to-actuator control",
