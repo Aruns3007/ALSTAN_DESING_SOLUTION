@@ -168,6 +168,19 @@ def _parse_dt(value):
         return None
 
 
+def _coerce_positive_int(value, fallback, minimum=1, maximum=None):
+    try:
+        parsed = int(value)
+    except (TypeError, ValueError):
+        return fallback
+
+    if parsed < minimum:
+        return fallback
+    if maximum is not None and parsed > maximum:
+        return fallback
+    return parsed
+
+
 def _b64url_encode(data):
     return base64.urlsafe_b64encode(data).rstrip(b"=").decode("ascii")
 
@@ -278,6 +291,18 @@ def validate_password_strength(password):
     if missing:
         return False, "Password must include " + ", ".join(missing) + "."
     return True, ""
+
+
+def get_security_policy(conn):
+    row = conn.execute(
+        "SELECT lockout_threshold, lockout_minutes FROM app_settings WHERE id = 1"
+    ).fetchone()
+    if not row:
+        return LOCKOUT_THRESHOLD, LOCKOUT_MINUTES
+
+    threshold = _coerce_positive_int(row["lockout_threshold"], LOCKOUT_THRESHOLD, minimum=1, maximum=50)
+    minutes = _coerce_positive_int(row["lockout_minutes"], LOCKOUT_MINUTES, minimum=1, maximum=24 * 60)
+    return threshold, minutes
 
 
 def sanitize_message(message):
@@ -485,6 +510,22 @@ def ensure_columns_and_defaults():
             )
             """
         )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS app_settings (
+                id INTEGER PRIMARY KEY CHECK (id = 1),
+                lockout_threshold INTEGER NOT NULL DEFAULT 5,
+                lockout_minutes INTEGER NOT NULL DEFAULT 15
+            )
+            """
+        )
+        conn.execute(
+            """
+            INSERT OR IGNORE INTO app_settings (id, lockout_threshold, lockout_minutes)
+            VALUES (1, ?, ?)
+            """,
+            (LOCKOUT_THRESHOLD, LOCKOUT_MINUTES),
+        )
 
         user_columns = _table_columns(conn, "users")
         if "password_hash" not in user_columns:
@@ -599,7 +640,16 @@ def _password_matches_and_upgrade(conn, user, password):
     return False
 
 
-def _clear_login_failures(conn, user_id):
+def _set_user_password(conn, user_id, password):
+    hashed = hash_password(password)
+    conn.execute(
+        "UPDATE users SET password_hash = ?, password = ? WHERE id = ?",
+        (hashed, hashed, user_id),
+    )
+    conn.commit()
+
+
+def _reset_login_security(conn, user_id):
     conn.execute(
         "UPDATE users SET failed_login_attempts = 0, lockout_until = NULL WHERE id = ?",
         (user_id,),
@@ -607,15 +657,28 @@ def _clear_login_failures(conn, user_id):
     conn.commit()
 
 
+def _clear_login_failures(conn, user_id):
+    _reset_login_security(conn, user_id)
+
+
 def _mark_failed_login(conn, user):
+    lockout_threshold, lockout_minutes = get_security_policy(conn)
     attempts = int(user["failed_login_attempts"] or 0) + 1
     lockout_until = None
-    if attempts >= LOCKOUT_THRESHOLD:
-        lockout_until = _format_dt(_utc_now() + timedelta(minutes=LOCKOUT_MINUTES))
+    if attempts >= lockout_threshold:
+        lockout_until = _format_dt(_utc_now() + timedelta(minutes=lockout_minutes))
         attempts = 0
     conn.execute(
         "UPDATE users SET failed_login_attempts = ?, lockout_until = ? WHERE id = ?",
         (attempts, lockout_until, user["id"]),
+    )
+    conn.commit()
+
+
+def _update_security_policy(conn, threshold, minutes):
+    conn.execute(
+        "UPDATE app_settings SET lockout_threshold = ?, lockout_minutes = ? WHERE id = 1",
+        (threshold, minutes),
     )
     conn.commit()
 
@@ -980,7 +1043,8 @@ def admin_login():
 
     if request.method == "POST":
         if not admin_exists:
-            return _handle_admin_signup()
+            flash("No admin account exists yet. Create the first admin first.", "info")
+            return redirect(url_for("setup_admin"))
 
         email = normalize_email(request.form.get("email"))
         password = request.form.get("password") or ""
@@ -1030,6 +1094,10 @@ def admin_login():
 @app.route("/setup_admin", methods=["GET", "POST"])
 def setup_admin():
     admin_exists = _admin_account_exists()
+    if admin_exists:
+        flash("An admin account already exists. Please use the admin login page.", "info")
+        return redirect(url_for("admin_login"))
+
     if request.method == "POST":
         return _handle_admin_signup()
 
@@ -1141,7 +1209,7 @@ def admin_panel():
     conn = get_db_connection()
     users = conn.execute(
         """
-        SELECT id, username, email, role, is_verified
+        SELECT id, username, email, role, is_verified, failed_login_attempts, lockout_until
         FROM users
         ORDER BY id
         """
@@ -1149,8 +1217,16 @@ def admin_panel():
     inquiries = conn.execute(
         "SELECT id, email, message, status FROM inquiries ORDER BY id DESC"
     ).fetchall()
+    lockout_threshold, lockout_minutes = get_security_policy(conn)
     conn.close()
-    return render_template("admin.html", users=users, inquiries=inquiries, current_user=get_current_user())
+    return render_template(
+        "admin.html",
+        users=users,
+        inquiries=inquiries,
+        current_user=get_current_user(),
+        lockout_threshold=lockout_threshold,
+        lockout_minutes=lockout_minutes,
+    )
 
 
 @app.route("/admin_create_user", methods=["POST"])
@@ -1216,6 +1292,149 @@ def promote_admin_by_email():
             flash(f"{user['username']} promoted to admin successfully.", "success")
         else:
             flash("User is already an admin.", "warning")
+        return redirect(url_for("admin_panel"))
+    finally:
+        conn.close()
+
+
+@app.route("/admin_change_password", methods=["POST"])
+@admin_required
+def admin_change_password():
+    current_password = request.form.get("current_password") or ""
+    new_password = request.form.get("new_password") or ""
+    confirm_password = request.form.get("confirm_password") or ""
+
+    if not current_password or not new_password or not confirm_password:
+        flash("All password fields are required.", "danger")
+        return redirect(url_for("admin_panel"))
+
+    if new_password != confirm_password:
+        flash("New passwords do not match.", "danger")
+        return redirect(url_for("admin_panel"))
+
+    password_ok, password_message = validate_password_strength(new_password)
+    if not password_ok:
+        flash(password_message, "danger")
+        return redirect(url_for("admin_panel"))
+
+    current_user = get_current_user()
+    conn = get_db_connection()
+    try:
+        user = conn.execute(
+            """
+            SELECT id, username, email, password, password_hash, otp_secret,
+                   is_verified, role, failed_login_attempts, lockout_until
+            FROM users
+            WHERE id = ?
+            """,
+            (current_user["id"],),
+        ).fetchone()
+        if not user or not _password_matches_and_upgrade(conn, user, current_password):
+            flash("Current password is incorrect.", "danger")
+            return redirect(url_for("admin_panel"))
+
+        _set_user_password(conn, user["id"], new_password)
+        _reset_login_security(conn, user["id"])
+        flash("Your admin password has been updated.", "success")
+        return redirect(url_for("admin_panel"))
+    finally:
+        conn.close()
+
+
+@app.route("/admin_reset_password", methods=["POST"])
+@admin_required
+def admin_reset_password():
+    try:
+        user_id = int(request.form.get("user_id") or 0)
+    except ValueError:
+        user_id = 0
+    new_password = request.form.get("new_password") or ""
+    confirm_password = request.form.get("confirm_password") or ""
+
+    if not user_id:
+        flash("Please choose an account.", "danger")
+        return redirect(url_for("admin_panel"))
+    if not new_password or not confirm_password:
+        flash("Both password fields are required.", "danger")
+        return redirect(url_for("admin_panel"))
+    if new_password != confirm_password:
+        flash("New passwords do not match.", "danger")
+        return redirect(url_for("admin_panel"))
+
+    password_ok, password_message = validate_password_strength(new_password)
+    if not password_ok:
+        flash(password_message, "danger")
+        return redirect(url_for("admin_panel"))
+
+    conn = get_db_connection()
+    try:
+        user = conn.execute(
+            """
+            SELECT id, username, email, role, failed_login_attempts, lockout_until
+            FROM users
+            WHERE id = ?
+            """,
+            (user_id,),
+        ).fetchone()
+        if not user:
+            flash("Account not found.", "warning")
+            return redirect(url_for("admin_panel"))
+
+        _set_user_password(conn, user["id"], new_password)
+        _reset_login_security(conn, user["id"])
+        flash(f"Password reset for {user['username']} and lockout cleared.", "success")
+        return redirect(url_for("admin_panel"))
+    finally:
+        conn.close()
+
+
+@app.route("/admin_unlock_user", methods=["POST"])
+@admin_required
+def admin_unlock_user():
+    try:
+        user_id = int(request.form.get("user_id") or 0)
+    except ValueError:
+        user_id = 0
+
+    if not user_id:
+        flash("Please choose an account.", "danger")
+        return redirect(url_for("admin_panel"))
+
+    conn = get_db_connection()
+    try:
+        user = conn.execute("SELECT id, username FROM users WHERE id = ?", (user_id,)).fetchone()
+        if not user:
+            flash("Account not found.", "warning")
+            return redirect(url_for("admin_panel"))
+
+        _reset_login_security(conn, user["id"])
+        flash(f"{user['username']} has been unlocked.", "success")
+        return redirect(url_for("admin_panel"))
+    finally:
+        conn.close()
+
+
+@app.route("/admin_security_limits", methods=["POST"])
+@admin_required
+def admin_security_limits():
+    threshold_raw = request.form.get("lockout_threshold")
+    minutes_raw = request.form.get("lockout_minutes")
+
+    try:
+        threshold = int(threshold_raw)
+        minutes = int(minutes_raw)
+    except (TypeError, ValueError):
+        flash("Please provide both security values.", "danger")
+        return redirect(url_for("admin_panel"))
+
+    if threshold < 1 or threshold > 20 or minutes < 1 or minutes > 1440:
+        flash("Lockout attempts must be between 1 and 20, and lockout minutes between 1 and 1440.", "danger")
+        return redirect(url_for("admin_panel"))
+
+    conn = get_db_connection()
+    try:
+        _update_security_policy(conn, threshold, minutes)
+        flash("Security limits updated successfully.", "success")
         return redirect(url_for("admin_panel"))
     finally:
         conn.close()

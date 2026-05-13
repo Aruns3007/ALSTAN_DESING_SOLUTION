@@ -39,6 +39,21 @@ def ensure_columns_and_defaults():
             )
             """
         )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS app_settings (
+                id INTEGER PRIMARY KEY CHECK (id = 1),
+                lockout_threshold INTEGER NOT NULL DEFAULT 5,
+                lockout_minutes INTEGER NOT NULL DEFAULT 15
+            )
+            """
+        )
+        conn.execute(
+            """
+            INSERT OR IGNORE INTO app_settings (id, lockout_threshold, lockout_minutes)
+            VALUES (1, 5, 15)
+            """
+        )
 
         user_columns = _table_columns(conn, "users")
         if "password_hash" not in user_columns:

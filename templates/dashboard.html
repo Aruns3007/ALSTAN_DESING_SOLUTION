@@ -7,146 +7,188 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root {
-            --bg: #070b12;
-            --panel: rgba(13, 18, 28, 0.84);
-            --panel-strong: rgba(18, 25, 39, 0.95);
-            --line: rgba(0, 209, 255, 0.18);
+            --bg: #05080f;
+            --panel: rgba(12, 17, 27, 0.86);
+            --panel-strong: rgba(17, 24, 37, 0.96);
+            --line: rgba(0, 209, 255, 0.16);
             --accent: #00d1ff;
-            --accent-soft: rgba(0, 209, 255, 0.12);
             --text-dim: rgba(255, 255, 255, 0.68);
         }
+
+        html { scroll-behavior: smooth; }
 
         body {
             min-height: 100vh;
             margin: 0;
             color: #fff;
+            font-family: "Aptos", "Segoe UI", system-ui, sans-serif;
             background:
-                radial-gradient(circle at top left, rgba(0, 209, 255, 0.16), transparent 28%),
-                radial-gradient(circle at top right, rgba(65, 112, 255, 0.12), transparent 24%),
-                linear-gradient(180deg, #05070c 0%, #0b111b 100%);
-            font-family: "Segoe UI", sans-serif;
+                radial-gradient(circle at top left, rgba(0, 209, 255, 0.14), transparent 26%),
+                radial-gradient(circle at top right, rgba(124, 141, 255, 0.12), transparent 22%),
+                linear-gradient(180deg, #04060a 0%, #0b111b 58%, #070b12 100%);
+            overflow-x: hidden;
         }
 
-        .dashboard-shell {
+        .shell {
             position: relative;
-            overflow: hidden;
+            min-height: 100vh;
         }
 
-        .dashboard-shell::before {
+        .shell::before {
             content: "";
             position: absolute;
             inset: 0;
             background-image:
-                linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
             background-size: 64px 64px;
-            mask-image: linear-gradient(180deg, rgba(0,0,0,0.48), rgba(0,0,0,0));
+            mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0));
             pointer-events: none;
+        }
+
+        .ambient {
+            position: absolute;
+            border-radius: 999px;
+            filter: blur(30px);
+            pointer-events: none;
+            opacity: 0.9;
+        }
+
+        .ambient.one {
+            width: 320px;
+            height: 320px;
+            top: -120px;
+            right: -120px;
+            background: rgba(0, 209, 255, 0.14);
+        }
+
+        .ambient.two {
+            width: 240px;
+            height: 240px;
+            left: -100px;
+            top: 280px;
+            background: rgba(124, 141, 255, 0.10);
         }
 
         .topbar {
             position: sticky;
             top: 0;
-            z-index: 20;
+            z-index: 40;
             backdrop-filter: blur(18px);
-            background: rgba(7, 11, 18, 0.8);
-            border-bottom: 1px solid rgba(255,255,255,0.08);
+            background: rgba(5, 8, 15, 0.82);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .brand-wrap {
+            display: flex;
+            align-items: center;
+            gap: 14px;
         }
 
         .brand-mark {
-            width: 44px;
-            height: 44px;
-            border-radius: 14px;
-            background: linear-gradient(145deg, rgba(0, 209, 255, 0.28), rgba(0, 209, 255, 0.05));
-            border: 1px solid var(--line);
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
             display: grid;
             place-items: center;
             color: var(--accent);
-            font-weight: 800;
+            font-weight: 900;
             letter-spacing: 0.08em;
+            background:
+                radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.34), transparent 32%),
+                linear-gradient(145deg, rgba(0, 209, 255, 0.28), rgba(0, 209, 255, 0.05));
+            border: 1px solid var(--line);
+            box-shadow: inset 0 0 24px rgba(0, 209, 255, 0.12);
         }
 
-        .hero-card,
-        .info-card,
-        .action-card,
-        .form-card {
+        .brand-title {
+            font-size: 0.95rem;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .brand-subtitle {
+            color: var(--text-dim);
+            font-size: 0.84rem;
+            margin-top: 2px;
+        }
+
+        .nav-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #fff;
+            font-size: 0.8rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .container-xxl {
+            position: relative;
+            z-index: 1;
+        }
+
+        .glass-card {
             background: var(--panel);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 24px;
-            box-shadow: 0 22px 80px rgba(0, 0, 0, 0.28);
-            backdrop-filter: blur(16px);
+            border-radius: 26px;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.30);
+            backdrop-filter: blur(18px);
         }
 
         .hero-card {
-            padding: 34px;
-            min-height: 100%;
+            padding: 32px;
             background:
                 linear-gradient(135deg, rgba(0, 209, 255, 0.10), transparent 42%),
-                var(--panel-strong);
+                linear-gradient(180deg, rgba(17, 24, 37, 0.98), rgba(12, 17, 27, 0.90));
         }
 
         .eyebrow {
             color: var(--accent);
-            letter-spacing: 0.24em;
-            font-size: 0.75rem;
             text-transform: uppercase;
+            letter-spacing: 0.24em;
+            font-size: 0.76rem;
         }
 
         .hero-title {
-            font-size: clamp(2.4rem, 5vw, 4.8rem);
-            line-height: 0.94;
-            font-weight: 800;
-            letter-spacing: -0.05em;
+            font-size: clamp(2.5rem, 5vw, 4.8rem);
+            line-height: 0.95;
+            font-weight: 900;
+            letter-spacing: -0.06em;
             margin-bottom: 1rem;
         }
 
-        .hero-title span {
-            color: var(--accent);
-        }
+        .hero-title span { color: var(--accent); }
 
         .subtext {
             color: var(--text-dim);
-            max-width: 680px;
-            font-size: 1.04rem;
-            line-height: 1.7;
+            max-width: 760px;
+            font-size: 1.02rem;
+            line-height: 1.75;
         }
 
-        .stat-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 14px;
-        }
-
-        .metric {
-            padding: 18px;
-            border-radius: 18px;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.06);
-        }
-
-        .metric .label {
-            color: rgba(255,255,255,0.58);
-            font-size: 0.78rem;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-        }
-
-        .metric .value {
-            font-size: 1.15rem;
-            font-weight: 700;
-            margin-top: 6px;
+        .pill-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 22px;
         }
 
         .pill {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 14px;
+            gap: 10px;
+            padding: 10px 14px;
             border-radius: 999px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             color: #fff;
-            font-size: 0.88rem;
+            font-size: 0.86rem;
         }
 
         .pill-dot {
@@ -154,74 +196,24 @@
             height: 9px;
             border-radius: 50%;
             background: var(--accent);
-            box-shadow: 0 0 16px rgba(0, 209, 255, 0.7);
+            box-shadow: 0 0 18px rgba(0, 209, 255, 0.75);
         }
 
-        .section-title {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-            color: var(--accent);
-            margin-bottom: 12px;
-        }
-
-        .info-card,
-        .action-card,
-        .form-card {
-            padding: 26px;
-            height: 100%;
-        }
-
-        .action-link {
+        .action-row {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 16px;
-            text-decoration: none;
-            color: #fff;
-            padding: 16px 18px;
-            border-radius: 16px;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.06);
-            transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
-        }
-
-        .action-link:hover {
-            transform: translateY(-2px);
-            border-color: rgba(0, 209, 255, 0.3);
-            background: rgba(0, 209, 255, 0.08);
-        }
-
-        .action-link small {
-            color: var(--text-dim);
-        }
-
-        .form-control {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.10);
-            color: #fff;
-            border-radius: 14px;
-        }
-
-        .form-control:focus {
-            background: rgba(255,255,255,0.05);
-            color: #fff;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 0.2rem rgba(0, 209, 255, 0.12);
-        }
-
-        textarea.form-control {
-            min-height: 140px;
-            resize: vertical;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 24px;
         }
 
         .btn-accent {
             background: var(--accent);
             color: #00131a;
             border: none;
-            font-weight: 700;
+            font-weight: 800;
             border-radius: 999px;
             padding: 12px 18px;
+            box-shadow: 0 14px 30px rgba(0, 209, 255, 0.18);
         }
 
         .btn-accent:hover {
@@ -229,13 +221,51 @@
             color: #00131a;
         }
 
+        .btn-soft,
+        .btn-outline-soft {
+            border-radius: 999px;
+            padding: 12px 18px;
+            font-weight: 700;
+        }
+
+        .btn-soft {
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            color: #fff;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .btn-soft:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+        }
+
+        .btn-outline-soft {
+            border: 1px solid rgba(0, 209, 255, 0.18);
+            color: var(--accent);
+            background: transparent;
+        }
+
+        .btn-outline-soft:hover {
+            background: rgba(0, 209, 255, 0.08);
+            color: #fff;
+        }
+
+        .section-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.22em;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+
         .status-badge {
             padding: 8px 12px;
             border-radius: 999px;
-            font-size: 0.8rem;
-            font-weight: 700;
+            font-size: 0.78rem;
+            font-weight: 800;
             letter-spacing: 0.08em;
             text-transform: uppercase;
+            white-space: nowrap;
         }
 
         .status-good {
@@ -250,14 +280,259 @@
             border: 1px solid rgba(255, 193, 7, 0.18);
         }
 
-        .mini-list {
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .summary-item,
+        .panel-card,
+        .form-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+        }
+
+        .summary-item {
+            padding: 16px;
+        }
+
+        .summary-item .label {
+            color: rgba(255, 255, 255, 0.58);
+            font-size: 0.76rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 6px;
+        }
+
+        .summary-item .value {
+            font-size: 1.02rem;
+            font-weight: 800;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .support-box {
+            padding: 18px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, rgba(0, 209, 255, 0.08), rgba(124, 141, 255, 0.05));
+            border: 1px solid rgba(0, 209, 255, 0.12);
+            color: rgba(255, 255, 255, 0.86);
+            line-height: 1.65;
+        }
+
+        .panel-card,
+        .form-card {
+            padding: 24px;
+            height: 100%;
+        }
+
+        .panel-card {
+            background: var(--panel);
+        }
+
+        .metric-strip {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .metric-card {
+            padding: 18px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            min-height: 100%;
+        }
+
+        .metric-card .icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            color: var(--accent);
+            background: rgba(0, 209, 255, 0.08);
+            border: 1px solid rgba(0, 209, 255, 0.16);
+            margin-bottom: 12px;
+            font-size: 1.05rem;
+        }
+
+        .metric-card .label {
+            color: rgba(255, 255, 255, 0.60);
+            font-size: 0.77rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+
+        .metric-card .value {
+            font-size: 1.04rem;
+            font-weight: 800;
+            margin-top: 6px;
+            line-height: 1.45;
+        }
+
+        .action-card {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 18px;
+            color: #fff;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 18px;
+            transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .action-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(0, 209, 255, 0.24);
+            background: rgba(0, 209, 255, 0.08);
+            color: #fff;
+        }
+
+        .action-card small {
+            color: var(--text-dim);
+        }
+
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 12px;
+        }
+
+        .timeline-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-top: 6px;
+            background: var(--accent);
+            box-shadow: 0 0 18px rgba(0, 209, 255, 0.75);
+            flex: 0 0 auto;
+        }
+
+        .timeline-body {
+            flex: 1;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .timeline-item:last-child .timeline-body {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .timeline-meta {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            color: var(--text-dim);
+            font-size: 0.82rem;
+            margin-bottom: 4px;
+        }
+
+        .note-list {
             margin: 0;
             padding-left: 18px;
             color: var(--text-dim);
         }
 
-        .mini-list li {
-            margin-bottom: 8px;
+        .note-list li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .form-label {
+            color: rgba(255, 255, 255, 0.70);
+            font-size: 0.78rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            color: #fff;
+            border-radius: 14px;
+        }
+
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 0.2rem rgba(0, 209, 255, 0.12);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.42);
+        }
+
+        textarea.form-control {
+            min-height: 170px;
+            resize: vertical;
+        }
+
+        .alert {
+            background: rgba(11, 16, 25, 0.94);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            backdrop-filter: blur(18px);
+        }
+
+        .alert-success { border-color: rgba(127, 255, 212, 0.18); }
+        .alert-warning { border-color: rgba(255, 193, 7, 0.18); }
+        .alert-danger { border-color: rgba(255, 90, 90, 0.18); }
+
+        .fade-in {
+            animation: fadeRise 0.7s ease both;
+        }
+
+        @keyframes fadeRise {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 991.98px) {
+            .summary-grid,
+            .metric-strip {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-card {
+                padding: 26px;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            .topbar .container-xxl {
+                align-items: flex-start !important;
+            }
+
+            .brand-wrap {
+                align-items: flex-start;
+            }
+
+            .hero-title {
+                font-size: clamp(2.1rem, 10vw, 4rem);
+            }
+
+            .action-row,
+            .pill-row {
+                gap: 10px;
+            }
         }
     </style>
 </head>
@@ -275,176 +550,243 @@
     {% endif %}
     {% endwith %}
 
-    <div class="dashboard-shell">
+    <div class="shell">
+        <div class="ambient one"></div>
+        <div class="ambient two"></div>
+
         <div class="topbar">
-            <div class="container py-3 d-flex align-items-center justify-content-between gap-3">
-                <div class="d-flex align-items-center gap-3">
+            <div class="container-xxl py-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div class="brand-wrap">
                     <div class="brand-mark">A</div>
                     <div>
-                        <div class="fw-bold">ALSTAN HUB</div>
-                        <div class="small text-white-50">User dashboard and account center</div>
+                        <div class="brand-title">Alstan Design</div>
+                        <div class="brand-subtitle">Secure client portal and project hub</div>
                     </div>
                 </div>
-                <div class="d-flex align-items-center gap-2">
-                    <a href="{{ url_for('index') }}" class="btn btn-outline-info btn-sm rounded-pill px-3">Home</a>
-                    <a href="/logout" class="btn btn-outline-danger btn-sm rounded-pill px-3">Logout</a>
+                <div class="d-flex flex-wrap align-items-center justify-content-end gap-2">
+                    <span class="nav-chip">Secure Session</span>
+                    <span class="nav-chip">2FA Ready</span>
+                    <a href="{{ url_for('index') }}" class="btn btn-soft btn-sm">Home</a>
+                    <a href="/logout" class="btn btn-outline-soft btn-sm">Logout</a>
                 </div>
             </div>
         </div>
 
-        <div class="container py-5 position-relative" style="z-index: 1;">
-            <div class="hero-card mb-4">
-                <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
-                    <div>
-                        <div class="eyebrow mb-2">Personal Workspace</div>
+        <div class="container-xxl py-4 py-lg-5">
+            <section class="glass-card hero-card mb-4 fade-in">
+                <div class="row g-4 align-items-stretch">
+                    <div class="col-12 col-xl-7">
+                        <div class="eyebrow mb-2">Client Overview</div>
                         <h1 class="hero-title mb-3">
                             Welcome back,<br>
                             <span>{{ current_user['username'] }}</span>
                         </h1>
                         <p class="subtext mb-0">
-                            This dashboard gives you a quick overview of your account, security status, and the fastest ways to contact the team or send a project inquiry.
+                            A cleaner view of your account, your security status, and the quickest way to contact the team.
+                            The layout is now organized to feel calmer, more professional, and easier to scan.
                         </p>
-                    </div>
-                    <div class="pill">
-                        <span class="pill-dot"></span>
-                        Connected and active
-                    </div>
-                </div>
 
-                <div class="row g-3">
-                    <div class="col-lg-8">
-                        <div class="stat-grid">
-                            <div class="metric">
-                                <div class="label">Account Type</div>
-                                <div class="value">{{ (current_user['role'] or 'user')|upper }}</div>
-                            </div>
-                            <div class="metric">
-                                <div class="label">Login Email</div>
-                                <div class="value text-truncate">{{ current_user['email'] }}</div>
-                            </div>
-                            <div class="metric">
-                                <div class="label">Security Layer</div>
-                                <div class="value">
-                                    {% if current_user['is_verified'] %}
-                                        2FA Enabled
-                                    {% else %}
-                                        2FA Pending
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="metric">
-                                <div class="label">Session Status</div>
-                                <div class="value">Protected Login</div>
-                            </div>
+                        <div class="pill-row">
+                            <span class="pill"><span class="pill-dot"></span> Protected login</span>
+                            <span class="pill"><span class="pill-dot"></span> Dashboard access active</span>
+                            <span class="pill"><span class="pill-dot"></span> Inquiry channel open</span>
+                        </div>
+
+                        <div class="action-row">
+                            <a href="#contact-form" class="btn btn-accent">Send Inquiry</a>
+                            <a href="{{ url_for('index') }}" class="btn btn-outline-soft">Explore Home</a>
                         </div>
                     </div>
-                    <div class="col-lg-4">
-                        <div class="info-card h-100">
-                            <div class="section-title">Account Status</div>
-                            <div class="d-flex flex-column gap-3">
+
+                    <div class="col-12 col-xl-5">
+                        <div class="glass-card" style="padding: 24px; background: var(--panel); height: 100%;">
+                            <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                                <div>
+                                    <div class="section-title mb-2">Account Snapshot</div>
+                                    <div class="fw-semibold fs-5">Your profile is ready</div>
+                                </div>
                                 {% if current_user['is_verified'] %}
                                     <div class="status-badge status-good">Identity verified</div>
-                                    <p class="text-white-50 mb-0">Your account has 2FA protection enabled.</p>
                                 {% else %}
-                                    <div class="status-badge status-warn">Verification needed</div>
-                                    <p class="text-white-50 mb-0">Complete 2FA setup for stronger account security.</p>
+                                    <div class="status-badge status-warn">Verification pending</div>
                                 {% endif %}
-                                <div class="small text-white-50">
-                                    Last login details are not stored here, but your session is protected by the app security controls.
+                            </div>
+
+                            <div class="summary-grid">
+                                <div class="summary-item">
+                                    <div class="label">Account Type</div>
+                                    <div class="value">{{ (current_user['role'] or 'user')|upper }}</div>
                                 </div>
+                                <div class="summary-item">
+                                    <div class="label">Login Email</div>
+                                    <div class="value text-truncate">{{ current_user['email'] }}</div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="label">Security Layer</div>
+                                    <div class="value">
+                                        {% if current_user['is_verified'] %}
+                                            2FA Enabled
+                                        {% else %}
+                                            2FA Needed
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="label">Session Status</div>
+                                    <div class="value">Protected Login</div>
+                                </div>
+                            </div>
+
+                            <div class="support-box mt-4">
+                                {% if current_user['is_verified'] %}
+                                    <strong>Security note:</strong> Your account has a second verification step enabled, which helps keep access reliable.
+                                {% else %}
+                                    <strong>Security note:</strong> Complete 2FA setup when you are ready for a stronger sign-in flow.
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <div class="row g-4">
-                <div class="col-lg-4">
-                    <div class="action-card">
+            <section class="row g-4 mb-4">
+                <div class="col-12 col-lg-4">
+                    <div class="metric-card glass-card">
+                        <div class="icon">ID</div>
+                        <div class="label">Client</div>
+                        <div class="value">{{ current_user['username'] }}</div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-4">
+                    <div class="metric-card glass-card">
+                        <div class="icon">2F</div>
+                        <div class="label">Security</div>
+                        <div class="value">
+                            {% if current_user['is_verified'] %}
+                                2FA Enabled
+                            {% else %}
+                                Setup Recommended
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-4">
+                    <div class="metric-card glass-card">
+                        <div class="icon">@</div>
+                        <div class="label">Contact</div>
+                        <div class="value">Fast inquiry response path</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="row g-4 mb-4">
+                <div class="col-12 col-xl-4">
+                    <div class="panel-card glass-card h-100">
                         <div class="section-title">Quick Actions</div>
                         <div class="d-grid gap-3">
-                            <a class="action-link" href="{{ url_for('index') }}">
-                                <div>
-                                    <div class="fw-semibold">Explore Home</div>
-                                    <small>Return to the main site and portfolio</small>
-                                </div>
-                                <span class="text-info">→</span>
+                            <a class="action-card" href="{{ url_for('index') }}">
+                                <div class="fw-semibold">Explore Home</div>
+                                <small>Return to the main site and portfolio</small>
                             </a>
-                            <a class="action-link" href="#contact-form">
-                                <div>
-                                    <div class="fw-semibold">Send Inquiry</div>
-                                    <small>Reach the team without leaving the dashboard</small>
-                                </div>
-                                <span class="text-info">→</span>
+                            <a class="action-card" href="#contact-form">
+                                <div class="fw-semibold">Send Inquiry</div>
+                                <small>Reach the team without leaving the dashboard</small>
                             </a>
-                            <a class="action-link" href="/logout">
-                                <div>
-                                    <div class="fw-semibold">Secure Logout</div>
-                                    <small>End your session safely</small>
-                                </div>
-                                <span class="text-info">→</span>
+                            <a class="action-card" href="/logout">
+                                <div class="fw-semibold">Secure Logout</div>
+                                <small>End your session safely</small>
                             </a>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-lg-4">
-                    <div class="action-card">
-                        <div class="section-title">Security Checklist</div>
-                        <ul class="mini-list">
-                            <li>Passwords are hashed before storage.</li>
-                            <li>CSRF protection is active on form submissions.</li>
-                            <li>Login sessions use secure auth cookies.</li>
-                            <li>Role checks protect admin-only areas.</li>
-                            <li>2FA adds a second verification step.</li>
+                <div class="col-12 col-xl-4">
+                    <div class="panel-card glass-card h-100">
+                        <div class="section-title">Portal Highlights</div>
+                        <ul class="timeline">
+                            <li class="timeline-item">
+                                <span class="timeline-dot"></span>
+                                <div class="timeline-body">
+                                    <div class="timeline-meta">
+                                        <span>Secure access</span>
+                                        <span>Active</span>
+                                    </div>
+                                    <div>Protected session handling and a clear account status view.</div>
+                                </div>
+                            </li>
+                            <li class="timeline-item">
+                                <span class="timeline-dot"></span>
+                                <div class="timeline-body">
+                                    <div class="timeline-meta">
+                                        <span>Verified account</span>
+                                        <span>Ready</span>
+                                    </div>
+                                    <div>The dashboard confirms whether 2FA is enabled or still needed.</div>
+                                </div>
+                            </li>
+                            <li class="timeline-item">
+                                <span class="timeline-dot"></span>
+                                <div class="timeline-body">
+                                    <div class="timeline-meta">
+                                        <span>Direct support</span>
+                                        <span>Available</span>
+                                    </div>
+                                    <div>Send project questions or support requests from the dashboard anytime.</div>
+                                </div>
+                            </li>
                         </ul>
                     </div>
                 </div>
 
-                <div class="col-lg-4">
-                    <div class="action-card">
+                <div class="col-12 col-xl-4">
+                    <div class="panel-card glass-card h-100">
                         <div class="section-title">Helpful Notes</div>
-                        <ul class="mini-list">
-                            <li>Use the main site to review services and projects.</li>
-                            <li>Use this dashboard to contact the team quickly.</li>
-                            <li>If 2FA is not enabled, complete it as soon as possible.</li>
+                        <ul class="note-list">
+                            <li>Use the main site to review services, projects, and portfolio content.</li>
+                            <li>This dashboard keeps your account status, quick links, and support entry points together.</li>
+                            <li>If 2FA is not enabled yet, it is worth completing for a stronger sign-in flow.</li>
+                            <li>The floating assistant can answer quick questions about the site and dashboard.</li>
                         </ul>
                     </div>
                 </div>
+            </section>
 
-                <div class="col-12">
-                    <div class="form-card" id="contact-form">
-                        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
-                            <div>
-                                <div class="section-title">Project Inquiry</div>
-                                <h3 class="fw-bold mb-2">Send the team a message</h3>
-                                <p class="text-white-50 mb-0">This replaces the old empty dashboard space with something useful: a direct inquiry form already linked to your account.</p>
-                            </div>
-                            <div class="pill">
-                                <span class="pill-dot"></span>
-                                Direct to Alstandesign
-                            </div>
-                        </div>
-
-                        <form action="{{ url_for('submit_inquiry') }}" method="POST" class="row g-3">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <div class="col-md-4">
-                                <label class="form-label small text-white-50">Your Email</label>
-                                <input type="email" name="email" class="form-control" value="{{ current_user['email'] }}" required>
-                            </div>
-                            <div class="col-md-8">
-                                <label class="form-label small text-white-50">Message</label>
-                                <textarea name="message" class="form-control" placeholder="Describe what you need help with, what project you want to discuss, or what feedback you have." required></textarea>
-                            </div>
-                            <div class="col-12 d-flex justify-content-end">
-                                <button type="submit" class="btn btn-accent px-4">Submit Inquiry</button>
-                            </div>
-                        </form>
+            <section class="form-card glass-card" id="contact-form">
+                <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+                    <div>
+                        <div class="section-title">Project Inquiry</div>
+                        <h3 class="fw-bold mb-2">Send a polished message to the team</h3>
+                        <p class="text-white-50 mb-0">
+                            This form is connected to your logged-in account and is the fastest way to request support or discuss a project.
+                        </p>
                     </div>
+                    <div class="nav-chip">Direct to Alstandesign</div>
                 </div>
-            </div>
+
+                <form action="{{ url_for('submit_inquiry') }}" method="POST" class="row g-3">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="col-12 col-md-4">
+                        <label class="form-label">Your Email</label>
+                        <input type="email" name="email" class="form-control" value="{{ current_user['email'] }}" required>
+                    </div>
+                    <div class="col-12 col-md-8">
+                        <label class="form-label">Message</label>
+                        <textarea
+                            name="message"
+                            class="form-control"
+                            placeholder="Describe what you need help with, what project you want to discuss, or what feedback you have."
+                            required
+                        ></textarea>
+                    </div>
+                    <div class="col-12 d-flex justify-content-end">
+                        <button type="submit" class="btn btn-accent px-4">Submit Inquiry</button>
+                    </div>
+                </form>
+            </section>
         </div>
     </div>
+
+    {% include "_client_assistant.html" %}
 </body>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </html>

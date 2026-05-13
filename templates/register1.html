@@ -10,13 +10,12 @@
     <style>
         :root {
             --accent-blue: #00D1FF;
-            --card-bg: #2d333b; /* Matches your screenshot color */
+            --card-bg: #2d333b;
         }
 
         body {
             background: #0B0E14;
-            /* Placeholder background image similar to your screenshot */
-            background-image: linear-gradient(rgba(11, 14, 20, 0.7), rgba(11, 14, 20, 0.7)), 
+            background-image: linear-gradient(rgba(11, 14, 20, 0.7), rgba(11, 14, 20, 0.7)),
                               url('https://images.unsplash.com/photo-1509228468518-180dd4864904?q=80&w=2070&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
@@ -93,28 +92,29 @@
     <div class="login-card">
         <p class="status-tag">Secure Access</p>
         <h2 class="fw-bold text-white mb-5">Client Portal</h2>
-        
+
         <form action="/" method="GET">
             <div class="text-start">
                 <label class="form-label-tech">Authorized ID</label>
                 <input type="text" class="form-control form-input-modern" placeholder="User Reference" required>
-                
+
                 <label class="form-label-tech">Security Key</label>
-                <input type="password" class="form-control form-input-modern" placeholder="••••••••" required>
+                <input type="password" class="form-control form-input-modern" placeholder="********" required>
             </div>
-            
+
             <button type="submit" class="btn-tech mt-3">INITIALIZE SESSION</button>
         </form>
-        
+
         <div class="mt-5 pt-3 border-top border-white-10">
             <p class="small" style="color: rgba(255,255,255,0.5);">
                 New Associate? <a href="/register" class="text-info text-decoration-none fw-bold">Enroll Identity</a>
             </p>
             <a href="/" class="d-block mt-3 small text-white-50 text-decoration-none">
-                ← Return to Main Terminal
+                &larr; Return to Main Terminal
             </a>
         </div>
     </div>
 
+    {% include "_client_assistant.html" %}
 </body>
 </html>

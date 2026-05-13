@@ -1,0 +1,411 @@
+{% set assistant_bottom = assistant_bottom|default('24px') %}
+<style>
+    .client-assistant {
+        position: fixed;
+        right: 22px;
+        bottom: var(--assistant-bottom, 24px);
+        z-index: 1200;
+        width: min(92vw, 390px);
+    }
+
+    .client-assistant-toggle {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 16px;
+        border-radius: 24px;
+        border: 1px solid rgba(0, 209, 255, 0.24);
+        background:
+            linear-gradient(135deg, rgba(7, 11, 18, 0.88), rgba(18, 25, 37, 0.74));
+        color: #fff;
+        backdrop-filter: blur(18px);
+        box-shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
+        cursor: pointer;
+        text-align: left;
+        animation: clientAssistantFloat 5.5s ease-in-out infinite;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .client-assistant-toggle::after {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        border-radius: 24px;
+        background: linear-gradient(120deg, transparent 20%, rgba(0, 209, 255, 0.12), transparent 80%);
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+    .client-assistant-toggle:hover {
+        transform: translateY(-2px);
+        border-color: rgba(0, 209, 255, 0.38);
+        box-shadow: 0 22px 52px rgba(0, 0, 0, 0.36);
+    }
+
+    .assistant-orb {
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        background:
+            radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.38), transparent 32%),
+            linear-gradient(145deg, rgba(0, 209, 255, 0.26), rgba(0, 209, 255, 0.06));
+        border: 1px solid rgba(0, 209, 255, 0.24);
+        display: grid;
+        place-items: center;
+        position: relative;
+        flex: 0 0 auto;
+        box-shadow: inset 0 0 24px rgba(0, 209, 255, 0.18), 0 0 24px rgba(0, 209, 255, 0.10);
+    }
+
+    .assistant-orb::before {
+        content: "";
+        position: absolute;
+        inset: -10px;
+        border-radius: 999px;
+        border: 1px solid rgba(0, 209, 255, 0.16);
+        animation: clientAssistantOrbit 4.2s linear infinite;
+    }
+
+    .assistant-orb svg {
+        width: 26px;
+        height: 26px;
+        color: #e9fbff;
+        position: relative;
+        z-index: 1;
+        filter: drop-shadow(0 0 10px rgba(0, 209, 255, 0.5));
+    }
+
+    .assistant-copy {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .assistant-label {
+        font-weight: 800;
+        letter-spacing: 0.01em;
+    }
+
+    .assistant-status {
+        font-size: 0.78rem;
+        color: rgba(255, 255, 255, 0.62);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .assistant-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 10px;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #c9faff;
+        background: rgba(0, 209, 255, 0.08);
+        border: 1px solid rgba(0, 209, 255, 0.16);
+        margin-bottom: 10px;
+    }
+
+    .assistant-badge-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #00d1ff;
+        box-shadow: 0 0 16px rgba(0, 209, 255, 0.8);
+    }
+
+    .client-assistant-panel {
+        margin-top: 12px;
+        background: rgba(10, 14, 20, 0.97);
+        border: 1px solid rgba(0, 209, 255, 0.18);
+        border-radius: 24px;
+        backdrop-filter: blur(18px);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.38);
+        overflow: hidden;
+        transform-origin: bottom right;
+    }
+
+    .client-assistant-header {
+        padding: 16px 18px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .client-assistant-header small {
+        color: rgba(255, 255, 255, 0.58);
+    }
+
+    .client-assistant-close {
+        border-radius: 999px;
+        border-color: rgba(0, 209, 255, 0.24);
+        color: #dffbff;
+    }
+
+    .client-assistant-body {
+        padding: 16px 18px 18px;
+    }
+
+    .client-assistant-quick {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .client-assistant-chip {
+        border: 1px solid rgba(0, 209, 255, 0.18);
+        background: rgba(0, 209, 255, 0.06);
+        color: #dffbff;
+        border-radius: 999px;
+        padding: 8px 12px;
+        font-size: 0.78rem;
+        transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+    }
+
+    .client-assistant-chip:hover {
+        transform: translateY(-1px);
+        background: rgba(0, 209, 255, 0.1);
+        border-color: rgba(0, 209, 255, 0.3);
+    }
+
+    .client-assistant-messages {
+        max-height: 240px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+
+    .client-assistant-bubble {
+        max-width: 90%;
+        padding: 12px 14px;
+        border-radius: 16px;
+        font-size: 0.92rem;
+        line-height: 1.5;
+    }
+
+    .client-assistant-bubble.bot {
+        background: rgba(0, 209, 255, 0.08);
+        border: 1px solid rgba(0, 209, 255, 0.16);
+        align-self: flex-start;
+    }
+
+    .client-assistant-bubble.user {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        align-self: flex-end;
+    }
+
+    .client-assistant-input-row {
+        display: flex;
+        gap: 10px;
+    }
+
+    .client-assistant-input {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(0, 209, 255, 0.18);
+        color: #fff;
+        border-radius: 14px;
+        padding: 11px 14px;
+    }
+
+    .client-assistant-input:focus {
+        outline: none;
+        border-color: #00d1ff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 209, 255, 0.12);
+    }
+
+    .client-assistant-send {
+        border: none;
+        background: #00d1ff;
+        color: #00131a;
+        font-weight: 700;
+        border-radius: 14px;
+        padding: 0 16px;
+    }
+
+    @media (max-width: 576px) {
+        .client-assistant {
+            left: 12px;
+            right: 12px;
+            width: auto;
+        }
+
+        .assistant-status {
+            display: none;
+        }
+    }
+
+    @keyframes clientAssistantFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-6px); }
+    }
+
+    @keyframes clientAssistantOrbit {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+</style>
+
+<div class="client-assistant" data-client-assistant style="--assistant-bottom: {{ assistant_bottom }};">
+    <button class="client-assistant-toggle" type="button" data-assistant-toggle aria-expanded="false">
+        <span class="assistant-orb" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18h6" />
+                <path d="M7.5 6.5h9A3.5 3.5 0 0 1 20 10v4a3.5 3.5 0 0 1-3.5 3.5h-9A3.5 3.5 0 0 1 4 14v-4a3.5 3.5 0 0 1 3.5-3.5Z" />
+                <path d="M9 10h.01" />
+                <path d="M15 10h.01" />
+                <path d="M12 2v2.5" />
+            </svg>
+        </span>
+        <span class="assistant-copy">
+            <span class="assistant-label">Client Assistant</span>
+            <span class="assistant-status">Floating help for login, dashboard, and support</span>
+        </span>
+        <span class="assistant-badge" aria-hidden="true">
+            <span class="assistant-badge-dot"></span>
+            Live
+        </span>
+    </button>
+
+    <div class="client-assistant-panel d-none" data-assistant-panel>
+        <div class="client-assistant-header">
+            <div>
+                <div class="assistant-badge">
+                    <span class="assistant-badge-dot"></span>
+                    Client-only support
+                </div>
+                <div class="fw-bold">Alstandesign Guide</div>
+                <small>Quick answers for clients using the public site and dashboard</small>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-info client-assistant-close" data-assistant-close>
+                Close
+            </button>
+        </div>
+
+        <div class="client-assistant-body">
+            <div class="client-assistant-quick">
+                <button type="button" class="client-assistant-chip" data-assistant-prompt="How do I log in?">Login</button>
+                <button type="button" class="client-assistant-chip" data-assistant-prompt="How do I reset my password?">Password Reset</button>
+                <button type="button" class="client-assistant-chip" data-assistant-prompt="How do I use the dashboard?">Dashboard</button>
+                <button type="button" class="client-assistant-chip" data-assistant-prompt="How do I contact support?">Contact</button>
+            </div>
+
+            <div class="client-assistant-messages" data-assistant-messages>
+                <div class="client-assistant-bubble bot">
+                    Hi, I can help with login, password recovery, dashboard navigation, portfolio details, and contacting the team.
+                </div>
+            </div>
+
+            <form class="client-assistant-input-row" data-assistant-form>
+                <input
+                    type="text"
+                    class="client-assistant-input"
+                    data-assistant-input
+                    placeholder="Ask me something about the site..."
+                    autocomplete="off"
+                >
+                <button type="submit" class="client-assistant-send">Send</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+(() => {
+    const root = document.querySelector('[data-client-assistant]');
+    if (!root) return;
+
+    const toggle = root.querySelector('[data-assistant-toggle]');
+    const panel = root.querySelector('[data-assistant-panel]');
+    const closeButton = root.querySelector('[data-assistant-close]');
+    const messages = root.querySelector('[data-assistant-messages]');
+    const form = root.querySelector('[data-assistant-form]');
+    const input = root.querySelector('[data-assistant-input]');
+
+    const replies = [
+        {
+            keywords: ['login', 'sign in', 'access'],
+            reply: 'Use the client login form with your email and password. After that, the app will guide you through any required verification steps.'
+        },
+        {
+            keywords: ['password', 'reset', 'forgot'],
+            reply: 'Open Forgot Password and follow the verification flow. It is designed to protect the account before the password is changed.'
+        },
+        {
+            keywords: ['dashboard', 'use the dashboard'],
+            reply: 'The dashboard gives clients a quick overview of account status, helpful shortcuts, and a direct inquiry form.'
+        },
+        {
+            keywords: ['contact', 'support', 'inquiry'],
+            reply: 'Use the inquiry form on the site or dashboard to contact the team. That is the fastest way to send a client request.'
+        },
+        {
+            keywords: ['portfolio', 'project', 'service', 'home'],
+            reply: 'The homepage shows the main services and portfolio areas. Open any card to learn more about that work.'
+        }
+    ];
+
+    function setOpen(isOpen) {
+        panel.classList.toggle('d-none', !isOpen);
+        toggle.setAttribute('aria-expanded', String(isOpen));
+        if (isOpen && input) {
+            window.setTimeout(() => input.focus(), 50);
+        }
+    }
+
+    function appendBubble(text, type = 'bot') {
+        const bubble = document.createElement('div');
+        bubble.className = `client-assistant-bubble ${type}`;
+        bubble.textContent = text;
+        messages.appendChild(bubble);
+        messages.scrollTop = messages.scrollHeight;
+    }
+
+    function respondToQuery(query) {
+        const normalized = query.toLowerCase();
+        const match = replies.find(item => item.keywords.some(keyword => normalized.includes(keyword)));
+        return match ? match.reply : 'I can help with login, password recovery, dashboard navigation, portfolio details, and contacting the team.';
+    }
+
+    toggle?.addEventListener('click', () => {
+        setOpen(panel.classList.contains('d-none'));
+    });
+
+    closeButton?.addEventListener('click', () => {
+        setOpen(false);
+    });
+
+    document.querySelectorAll('[data-assistant-prompt]').forEach(button => {
+        button.addEventListener('click', () => {
+            const prompt = button.getAttribute('data-assistant-prompt') || '';
+            if (!prompt) return;
+            appendBubble(prompt, 'user');
+            appendBubble(respondToQuery(prompt), 'bot');
+            setOpen(true);
+        });
+    });
+
+    form?.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const prompt = (input?.value || '').trim();
+        if (!prompt) return;
+        appendBubble(prompt, 'user');
+        appendBubble(respondToQuery(prompt), 'bot');
+        if (input) input.value = '';
+        setOpen(true);
+    });
+})();
+</script>

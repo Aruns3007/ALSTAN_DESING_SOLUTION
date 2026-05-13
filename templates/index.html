@@ -109,6 +109,33 @@
 
         .detail-link:hover { color: #8be9ff; }
 
+        .portfolio-card-link {
+            display: block;
+            height: 100%;
+            color: inherit;
+            text-decoration: none;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .portfolio-card-link:hover { color: inherit; }
+
+        .portfolio-card-link:hover .bento-card {
+            border-color: var(--accent-blue);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 209, 255, 0.15);
+        }
+
+        .portfolio-card-link .bento-card {
+            height: 100%;
+        }
+
+        .portfolio-card-link:focus-visible .bento-card,
+        .portfolio-card-link:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 0.2rem rgba(0, 209, 255, 0.18), 0 10px 30px rgba(0, 209, 255, 0.15);
+        }
+
         .location-panel {
             background: rgba(9, 12, 18, 0.8);
             border: 1px solid rgba(0, 209, 255, 0.18);
@@ -340,76 +367,80 @@
 
         <section class="row g-4 mb-5 reveal-hidden" id="portfolio">
             <div class="col-md-8">
-                <div class="bento-card position-relative overflow-hidden">
-                    {% set semiconductors_video = card_videos.get('semiconductors') %}
-                    {% if semiconductors_video %}
-                    <div class="methodology-media mb-3 rounded-4">
-                        <video class="w-100 h-100" autoplay muted loop playsinline>
-                            <source src="{{ semiconductors_video.url }}" type="video/mp4">
-                            Your browser does not support embedded videos.
-                        </video>
-                    </div>
-                    {% endif %}
-                    <div>
-                        <div class="mb-4">
-                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-info"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M20 12h2"/><path d="M2" 12h2"/></svg>
+                <a href="{{ url_for('portfolio_detail', slug='semiconductors') }}" class="portfolio-card-link" aria-label="Open Semiconductors and VLSI portfolio detail">
+                    <div class="bento-card position-relative overflow-hidden">
+                        {% set semiconductors_video = card_videos.get('semiconductors') %}
+                        {% if semiconductors_video %}
+                        <div class="methodology-media mb-3 rounded-4">
+                            <video class="w-100 h-100" autoplay muted loop playsinline>
+                                <source src="{{ semiconductors_video.url }}" type="video/mp4">
+                                Your browser does not support embedded videos.
+                            </video>
                         </div>
-                        <h2 class="display-6 fw-bold text-white">Semiconductors & VLSI</h2>
-                        <p class="text-white-50 mt-3">{{ semiconductors_video.description if semiconductors_video else 'RTL design, verification, and timing-aware implementation for low-power silicon workflows.' }}</p>
+                        {% endif %}
+                        <div>
+                            <div class="mb-4">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-info"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M20 12h2"/><path d="M2" 12h2"/></svg>
+                            </div>
+                            <h2 class="display-6 fw-bold text-white">Semiconductors & VLSI</h2>
+                            <p class="text-white-50 mt-3">{{ semiconductors_video.description if semiconductors_video else 'RTL design, verification, and timing-aware implementation for low-power silicon workflows.' }}</p>
+                        </div>
                     </div>
-                    <a href="{{ url_for('portfolio_detail', slug='semiconductors') }}" class="detail-link mt-3 d-inline-block">[ LEARN ABOUT VLSI ]</a>
-                </div>
+                </a>
             </div>
 
             <div class="col-md-4">
-                <div class="bento-card accent-card">
-                    {% set ai_video = card_videos.get('ai') %}
-                    {% if ai_video %}
-                    <div class="card-video">
-                        <video class="w-100 h-100" autoplay muted loop playsinline>
-                            <source src="{{ ai_video.url }}" type="video/mp4">
-                            Your browser does not support embedded videos.
-                        </video>
+                <a href="{{ url_for('portfolio_detail', slug='ai') }}" class="portfolio-card-link" aria-label="Open AI and Neural Networks portfolio detail">
+                    <div class="bento-card accent-card">
+                        {% set ai_video = card_videos.get('ai') %}
+                        {% if ai_video %}
+                        <div class="card-video">
+                            <video class="w-100 h-100" autoplay muted loop playsinline>
+                                <source src="{{ ai_video.url }}" type="video/mp4">
+                                Your browser does not support embedded videos.
+                            </video>
+                        </div>
+                        {% endif %}
+                        <h2 class="fw-bold mb-0">AI & Neural Networks</h2>
+                        <p class="small mt-2 opacity-75">{{ ai_video.description if ai_video else 'Inference pipelines and model-driven control tuned for real-world automation.' }}</p>
                     </div>
-                    {% endif %}
-                    <h2 class="fw-bold mb-0">AI & Neural Networks</h2>
-                    <p class="small mt-2 opacity-75">{{ ai_video.description if ai_video else 'Inference pipelines and model-driven control tuned for real-world automation.' }}</p>
-                    <a href="{{ url_for('portfolio_detail', slug='ai') }}" class="detail-link mt-3 d-inline-block text-white">[ LEARN ABOUT AI ]</a>
-                </div>
+                </a>
             </div>
 
             <div class="col-md-4">
-                <div class="bento-card">
-                    {% set cloud_video = card_videos.get('cloud') %}
-                    {% if cloud_video %}
-                    <div class="card-video">
-                        <video class="w-100 h-100" autoplay muted loop playsinline>
-                            <source src="{{ cloud_video.url }}" type="video/mp4">
-                            Your browser does not support embedded videos.
-                        </video>
+                <a href="{{ url_for('portfolio_detail', slug='cloud') }}" class="portfolio-card-link" aria-label="Open Cloud and DevOps portfolio detail">
+                    <div class="bento-card">
+                        {% set cloud_video = card_videos.get('cloud') %}
+                        {% if cloud_video %}
+                        <div class="card-video">
+                            <video class="w-100 h-100" autoplay muted loop playsinline>
+                                <source src="{{ cloud_video.url }}" type="video/mp4">
+                                Your browser does not support embedded videos.
+                            </video>
+                        </div>
+                        {% endif %}
+                        <h3 class="fw-bold text-white">Cloud & DevOps</h3>
+                        <p class="text-white-50 small">{{ cloud_video.description if cloud_video else 'Resilient multi-region delivery with CI/CD, observability, and rollback planning.' }}</p>
                     </div>
-                    {% endif %}
-                    <h3 class="fw-bold text-white">Cloud & DevOps</h3>
-                    <p class="text-white-50 small">{{ cloud_video.description if cloud_video else 'Resilient multi-region delivery with CI/CD, observability, and rollback planning.' }}</p>
-                    <a href="{{ url_for('portfolio_detail', slug='cloud') }}" class="detail-link mt-2 d-inline-block">[ LEARN ABOUT CLOUD ]</a>
-                </div>
+                </a>
             </div>
 
             <div class="col-md-8">
-                <div class="bento-card">
-                    {% set process_video = card_videos.get('process') %}
-                    {% if process_video %}
-                    <div class="card-video">
-                        <video class="w-100 h-100" autoplay muted loop playsinline>
-                            <source src="{{ process_video.url }}" type="video/mp4">
-                            Your browser does not support embedded videos.
-                        </video>
+                <a href="{{ url_for('portfolio_detail', slug='process') }}" class="portfolio-card-link" aria-label="Open Process Automation portfolio detail">
+                    <div class="bento-card">
+                        {% set process_video = card_videos.get('process') %}
+                        {% if process_video %}
+                        <div class="card-video">
+                            <video class="w-100 h-100" autoplay muted loop playsinline>
+                                <source src="{{ process_video.url }}" type="video/mp4">
+                                Your browser does not support embedded videos.
+                            </video>
+                        </div>
+                        {% endif %}
+                        <h3 class="fw-bold text-white">Process Automation</h3>
+                        <p class="text-white-50">{{ process_video.description if process_video else 'Sensor-to-actuator control and production orchestration for stable operations.' }}</p>
                     </div>
-                    {% endif %}
-                    <h3 class="fw-bold text-white">Process Automation</h3>
-                    <p class="text-white-50">{{ process_video.description if process_video else 'Sensor-to-actuator control and production orchestration for stable operations.' }}</p>
-                    <a href="{{ url_for('portfolio_detail', slug='process') }}" class="detail-link mt-2 d-inline-block">[ LEARN ABOUT AUTOMATION ]</a>
-                </div>
+                </a>
             </div>
         </section>
 
@@ -523,8 +554,11 @@
         </section>
     </main>
 
+    {% set assistant_bottom = '96px' %}
+    {% include "_client_assistant.html" %}
+
     <footer class="container py-5 text-center border-top border-white-10">
-        <p class="text-white-50 small">© 2026 Alstandesign Systems Pvt Ltd.</p>
+        <p class="text-white-50 small">&copy; 2026 Alstandesign Systems Pvt Ltd.</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -544,6 +578,7 @@
                 setTimeout(() => { tickerEl.innerText = statuses[currentIdx]; tickerEl.style.opacity = 1; }, 500);
             }
         }, 3000);
+
     </script>
 </body>
 </html>
